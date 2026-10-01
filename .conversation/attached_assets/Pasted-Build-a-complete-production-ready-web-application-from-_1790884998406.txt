@@ -1,0 +1,494 @@
+Build a complete, production-ready web application from scratch.
+
+IMPORTANT:
+This is NOT a prototype, landing page, mockup, or simple portfolio.
+Build a real scalable project platform that I can keep using and expanding.
+
+CORE IDEA:
+Create my own futuristic project platform where ONLY the website owner/admin can add projects.
+Public visitors must NEVER be able to submit, upload, edit, publish, or add projects.
+
+The platform will contain only my own projects.
+Do NOT list, embed, promote, or distribute other people's GitHub repositories.
+Do NOT add a public GitHub repository field to project pages.
+
+ZERO-COST-FIRST REQUIREMENT:
+Build using free/open-source technologies and free tiers wherever possible.
+Do not require paid software, paid APIs, paid hosting, paid database, or paid developer tools for development/testing.
+The application must remain usable with free-tier services.
+Keep the code portable so it can later be moved to another AI coding tool or normal code editor.
+Do not make the application dependent on this AI platform.
+
+DESIGN:
+Create a premium futuristic 3D-style interface.
+Use:
+- dark futuristic theme
+- light mode
+- 3D visual depth
+- glass effects where appropriate
+- smooth animations
+- modern technology aesthetic
+- interactive project cards
+- hover effects
+- subtle 3D motion
+- smooth page transitions
+- polished professional UI
+
+Do not make animations so heavy that they slow the website.
+
+RESPONSIVE:
+The website must work properly on:
+- desktop
+- laptop
+- tablet
+- mobile
+
+PAGES:
+- Home
+- All Projects
+- Free Projects
+- Premium Projects
+- Search
+- Individual Project Page
+- Subscription
+- Login
+- Sign Up
+- My Account
+- Favorites
+- Download History
+- Notifications
+- About
+- Privacy Policy
+- Terms & Conditions
+- Subscription/Refund Policy
+- Admin Login
+- Admin Dashboard
+- 404 / Error pages
+
+HOME:
+Create:
+- futuristic hero section
+- large search bar
+- featured projects
+- newly added projects
+- popular projects
+- free projects
+- premium projects
+- categories
+- strong project cards
+- modern navigation
+- clear FREE and PREMIUM labels
+
+PROJECT CATEGORIES:
+Use examples:
+- AI
+- Anime
+- Tools
+- Games
+- Desktop
+- Web
+- Windows
+- Android
+- Experiments
+
+SEARCH:
+Create a fast search bar.
+Users can search by:
+- project name
+- description
+- category
+- tags
+
+Add filters:
+- Free
+- Premium
+- Latest
+- Popular
+- Category
+
+PROJECT CARDS:
+Each card should show:
+- thumbnail
+- project name
+- short description
+- category
+- FREE or PREMIUM badge
+- NEW badge when applicable
+- FEATURED badge when applicable
+- view/download information
+- open project button
+
+DYNAMIC PROJECT SYSTEM:
+Every project must have a separate dynamic page.
+
+Example:
+site.com/projects/jarvis
+site.com/projects/anime-vision
+
+The website must NOT need to be rebuilt whenever a new project is added.
+
+Every project page must support:
+- project name
+- short description
+- full description
+- thumbnail
+- screenshots
+- screenshot gallery
+- preview video
+- version
+- file size
+- supported OS/device
+- requirements
+- release date
+- last updated
+- What's New
+- changelog
+- download button
+- FREE/PREMIUM badge
+- favorite button
+- view count
+- download count
+
+FREE PROJECTS:
+Free projects must support:
+- public project page
+- public preview video
+- free download
+
+PREMIUM PROJECTS:
+Premium projects must support:
+- premium badge
+- locked premium files
+- locked premium video
+- premium features
+- subscription-required access
+
+Do NOT protect premium content only with frontend hiding.
+Premium files and videos must be protected with backend/server-side authorization.
+
+VIDEO SYSTEM:
+Every project can have a preview video.
+
+For FREE projects:
+show the preview normally.
+
+For PREMIUM projects:
+show a locked preview area.
+Display a premium message such as:
+"Premium access required to unlock this content."
+
+After valid premium authorization/subscription:
+unlock the premium video.
+
+DOWNLOAD SYSTEM:
+FREE:
+download immediately when allowed.
+
+PREMIUM:
+download only after valid authenticated premium authorization.
+
+Do not expose direct premium file URLs publicly.
+
+INITIAL EXAMPLE PROJECTS:
+Create example structure for:
+
+1. JARVIS — FREE
+Basic AI assistant project.
+Show a proper description and free feature list.
+
+2. JARVIS — PREMIUM
+Advanced JARVIS version.
+Clearly label the description with PREMIUM.
+Show advanced/premium features.
+
+3. ANIME VISION
+Webcam-based anime transformation/visual project.
+
+These examples must be editable/deletable from the admin dashboard.
+
+IMPORTANT:
+These are examples for structure only.
+Make it easy for me to replace them with my real projects.
+
+ADMIN SYSTEM:
+Create a PRIVATE admin dashboard.
+
+Only authorized owner/admin accounts can access admin features.
+
+Public visitors must NOT have:
+- Add Project
+- Upload Project
+- Submit Project
+- Edit Project
+- Publish Project
+
+Admin can:
+- add project
+- edit project
+- delete project
+- publish
+- unpublish
+- archive
+- duplicate
+- change Free/Premium
+- set Featured
+- set New
+- upload project files
+- upload/change video
+- upload/change screenshots
+- change thumbnail
+- edit version
+- edit requirements
+- edit description
+- edit changelog
+- manage categories
+- manage tags
+
+NEW PROJECT WORKFLOW:
+Admin Dashboard
+→ Add New Project
+→ enter project information
+→ upload files
+→ upload preview video
+→ upload screenshots
+→ choose FREE/PREMIUM
+→ Publish
+
+After publishing:
+automatically show the project in:
+- Projects
+- Search
+- Categories
+- Free or Premium section
+- New Projects if marked new
+- Featured Projects if marked featured
+- its own dynamic URL
+
+USER ACCOUNTS:
+Create:
+- Sign up
+- login
+- logout
+- user profile
+- subscription status
+- download history
+- favorites
+- saved projects
+- notifications
+
+FAVORITES:
+Users can save projects to favorites.
+
+NOTIFICATIONS:
+Support notifications for:
+- new project
+- new version
+- important project updates
+- subscription updates
+
+SUBSCRIPTION SYSTEM:
+Create a proper subscription architecture for premium access.
+
+Include:
+- subscription page
+- premium plan information
+- subscription status
+- active/inactive state
+- expiration
+- upgrade-ready structure
+- payment integration-ready structure
+
+Development and testing must work without requiring me to spend money.
+
+For real payment processing, create secure integration points and configuration placeholders.
+Do NOT expose payment/API secrets in frontend code.
+
+ADMIN ANALYTICS:
+Admin dashboard should show:
+- total users
+- project views
+- downloads
+- favorites
+- subscriptions
+- popular projects
+- revenue data when payment integration is connected
+
+PROJECT ANALYTICS:
+Track:
+- views
+- downloads
+- favorites
+
+UPDATE SYSTEM:
+Each project supports:
+- version
+- release date
+- What's New
+- changelog
+- NEW badge
+- update notifications
+
+SEO:
+Make every project page search-engine friendly.
+
+Include:
+- unique title
+- meta description
+- clean URL/slugs
+- Open Graph metadata
+- sitemap
+- robots.txt
+- canonical URL where appropriate
+- structured metadata where useful
+- proper heading hierarchy
+
+Example:
+site.com/projects/jarvis
+
+PERFORMANCE:
+Use:
+- lazy loading
+- optimized media
+- efficient queries
+- caching where appropriate
+- minimal unnecessary JavaScript
+- fast page loading
+
+SECURITY-FIRST:
+Security is a critical requirement.
+
+Implement:
+- secure authentication
+- strong password hashing
+- protected admin routes
+- role-based authorization
+- secure sessions
+- server-side validation
+- input sanitization
+- XSS protection
+- CSRF protection
+- SQL/NoSQL injection protection
+- rate limiting
+- brute-force protection
+- secure file upload validation
+- allowed file types
+- file size limits
+- secure storage access
+- backend premium authorization
+- no API keys/secrets in frontend
+- safe error handling
+- security headers
+- CSP where appropriate
+- dependency/security checks
+- least-privilege permissions
+- audit-friendly admin actions
+- backup/recovery-friendly structure
+
+VERY IMPORTANT:
+Never trust frontend-only security.
+All important admin and premium authorization must be verified server-side.
+
+DATABASE:
+Use a suitable free-tier database/backend.
+
+Create data structures for:
+- users
+- profiles
+- projects
+- categories
+- tags
+- project screenshots
+- project videos
+- project files
+- favorites
+- downloads
+- subscriptions
+- notifications
+- project views
+- admin actions
+
+STORAGE:
+Free project files can be accessible where intended.
+Premium project files must require authenticated authorized access.
+
+ADS:
+Prepare clean ad placement areas for future monetization.
+Do not make ads required for the website to function.
+Do not let ads destroy the user experience.
+
+MONETIZATION:
+Architecture should support:
+- advertisements
+- premium subscriptions
+- premium project access
+- future monetization options
+
+LEGAL:
+Create:
+- Privacy Policy
+- Terms & Conditions
+- Subscription/Refund Policy
+- Disclaimer
+
+ACCESSIBILITY:
+Use:
+- good contrast
+- readable typography
+- keyboard accessibility
+- accessible labels
+- clear buttons
+
+PORTABILITY:
+Keep source code clean and portable.
+Use standard web technologies.
+Use reusable components.
+Do not lock the code to Replit.
+Keep secrets in environment variables.
+Do not hardcode secrets.
+
+CODE QUALITY:
+Use:
+- modular components
+- reusable architecture
+- clean naming
+- sensible folder structure
+- proper error handling
+- minimal unnecessary dependencies
+
+DO NOT:
+- create fake buttons
+- create fake authentication
+- create fake downloads
+- create fake subscriptions
+- make a fake admin dashboard
+- hardcode premium access in the frontend
+- rebuild the entire website when adding a new project
+
+TESTING:
+Before finishing, test:
+- sign up
+- login
+- logout
+- search
+- filtering
+- project browsing
+- project page
+- free download
+- favorites
+- admin login
+- admin-only project creation
+- edit project
+- publish/unpublish
+- dynamic project pages
+- premium access logic
+- protected premium file access
+- responsive design
+- error pages
+
+Fix runtime errors, console errors, broken routes, broken database operations, and broken UI states before declaring the application complete.
+
+MOST IMPORTANT:
+This must be a REAL full web application, not a prototype.
+Only the website owner can add projects.
+Visitors can only browse, search, view, favorite, download allowed files, and access premium content according to their subscription.
+The architecture must allow me to add new projects every week without rebuilding the website.

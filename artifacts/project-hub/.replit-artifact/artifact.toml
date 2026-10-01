@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Project Hub"
+description = "A private-owner platform for publishing and sharing original software projects, with searchable project pages, free and premium access paths, account tools, and an owner-only project dashboard."
+version = "1.0.0"
+id = "artifacts/project-hub"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18869
+
+[services.development]
+run = "pnpm --filter @workspace/project-hub run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/project-hub", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/project-hub/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18869"
+BASE_PATH = "/"

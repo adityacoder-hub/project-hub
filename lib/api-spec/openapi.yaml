@@ -3,20 +3,21 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: API for the owner-managed Project Hub catalog.
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
-    description: Health operations
+  - name: projects
+  - name: account
+  - name: admin
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +25,512 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /projects:
+    get:
+      operationId: listProjects
+      tags: [projects]
+      summary: Browse published projects
+      parameters:
+        - in: query
+          name: q
+          schema: { type: string }
+        - in: query
+          name: category
+          schema: { type: string }
+        - in: query
+          name: access
+          schema: { type: string, enum: [all, free, premium] }
+        - in: query
+          name: sort
+          schema: { type: string, enum: [latest, popular] }
+        - in: query
+          name: featured
+          schema: { type: boolean }
+      responses:
+        "200":
+          description: Matching published projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Project" }
+  /projects/{slug}:
+    get:
+      operationId: getProject
+      tags: [projects]
+      summary: View a published project
+      parameters:
+        - $ref: "#/components/parameters/Slug"
+      responses:
+        "200":
+          description: Project details
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ProjectDetail" }
+        "404":
+          description: Project not found
+  /projects/{slug}/views:
+    post:
+      operationId: recordProjectView
+      tags: [projects]
+      summary: Record a project page view
+      parameters:
+        - $ref: "#/components/parameters/Slug"
+      responses:
+        "200":
+          description: View recorded
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ActionResult" }
+  /projects/{slug}/download:
+    post:
+      operationId: requestProjectDownload
+      tags: [projects]
+      summary: Request a download after server-side access checks
+      parameters:
+        - $ref: "#/components/parameters/Slug"
+      responses:
+        "200":
+          description: Download request accepted
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DownloadResult" }
+        "401":
+          description: Sign-in or an active premium entitlement is required
+        "403":
+          description: The project file is unavailable or access is not allowed
+  /me:
+    get:
+      operationId: getAccount
+      tags: [account]
+      summary: Get the signed-in account
+      responses:
+        "200":
+          description: Account profile and role
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Account" }
+        "401":
+          description: Authentication required
+  /me/favorites:
+    get:
+      operationId: listFavorites
+      tags: [account]
+      summary: List the signed-in user's favorites
+      responses:
+        "200":
+          description: Favorite projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Project" }
+        "401":
+          description: Authentication required
+  /me/favorites/{slug}:
+    put:
+      operationId: saveFavorite
+      tags: [account]
+      summary: Save a project to favorites
+      parameters:
+        - $ref: "#/components/parameters/Slug"
+      responses:
+        "200":
+          description: Favorite saved
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ActionResult" }
+        "401":
+          description: Authentication required
+    delete:
+      operationId: removeFavorite
+      tags: [account]
+      summary: Remove a project from favorites
+      parameters:
+        - $ref: "#/components/parameters/Slug"
+      responses:
+        "200":
+          description: Favorite removed
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ActionResult" }
+        "401":
+          description: Authentication required
+  /me/downloads:
+    get:
+      operationId: listDownloads
+      tags: [account]
+      summary: List the signed-in user's download history
+      responses:
+        "200":
+          description: Download history
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/DownloadRecord" }
+        "401":
+          description: Authentication required
+  /me/notifications:
+    get:
+      operationId: listNotifications
+      tags: [account]
+      summary: List account notifications
+      responses:
+        "200":
+          description: Notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Notification" }
+        "401":
+          description: Authentication required
+  /me/subscription:
+    get:
+      operationId: getSubscription
+      tags: [account]
+      summary: Get premium subscription status
+      responses:
+        "200":
+          description: Subscription state
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Subscription" }
+        "401":
+          description: Authentication required
+  /admin/overview:
+    get:
+      operationId: getAdminOverview
+      tags: [admin]
+      summary: Get owner dashboard metrics
+      responses:
+        "200":
+          description: Analytics overview
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminOverview" }
+        "401":
+          description: Authentication required
+        "403":
+          description: Owner access required
+  /admin/projects:
+    get:
+      operationId: listAdminProjects
+      tags: [admin]
+      summary: List all projects including drafts
+      responses:
+        "200":
+          description: Owner's projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Project" }
+        "401":
+          description: Authentication required
+        "403":
+          description: Owner access required
+    post:
+      operationId: createProject
+      tags: [admin]
+      summary: Create a project draft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProjectInput" }
+      responses:
+        "201":
+          description: Project created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Project" }
+        "400":
+          description: Invalid project details
+        "401":
+          description: Authentication required
+        "403":
+          description: Owner access required
+  /admin/projects/{slug}:
+    patch:
+      operationId: updateProject
+      tags: [admin]
+      summary: Update a project
+      parameters:
+        - $ref: "#/components/parameters/Slug"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProjectUpdate" }
+      responses:
+        "200":
+          description: Project updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Project" }
+        "401":
+          description: Authentication required
+        "403":
+          description: Owner access required
+        "404":
+          description: Project not found
+    delete:
+      operationId: archiveProject
+      tags: [admin]
+      summary: Archive a project without permanently deleting its history
+      parameters:
+        - $ref: "#/components/parameters/Slug"
+      responses:
+        "200":
+          description: Project archived
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ActionResult" }
+        "401":
+          description: Authentication required
+        "403":
+          description: Owner access required
+        "404":
+          description: Project not found
+  /admin/projects/{slug}/publication:
+    put:
+      operationId: setProjectPublication
+      tags: [admin]
+      summary: Publish or unpublish a project
+      parameters:
+        - $ref: "#/components/parameters/Slug"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PublicationInput" }
+      responses:
+        "200":
+          description: Publication state updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Project" }
+        "401":
+          description: Authentication required
+        "403":
+          description: Owner access required
+        "404":
+          description: Project not found
 components:
+  parameters:
+    Slug:
+      in: path
+      name: slug
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 100 }
   schemas:
     HealthStatus:
       type: object
       properties:
-        status:
-          type: string
+        status: { type: string }
+      required: [status]
+    Project:
+      type: object
       required:
+        - id
+        - slug
+        - title
+        - shortDescription
+        - description
+        - category
+        - tags
+        - access
         - status
-
+        - featured
+        - isNew
+        - version
+        - views
+        - downloads
+        - favorites
+        - releaseDate
+        - updatedAt
+        - screenshots
+        - supportedDevices
+        - requirements
+        - whatsNew
+        - changelog
+        - fileAvailable
+        - videoLocked
+      properties:
+        id: { type: string }
+        slug: { type: string }
+        title: { type: string }
+        shortDescription: { type: string }
+        description: { type: string }
+        category: { type: string }
+        tags:
+          type: array
+          items: { type: string }
+        access: { type: string, enum: [free, premium] }
+        status: { type: string, enum: [draft, published, archived] }
+        featured: { type: boolean }
+        isNew: { type: boolean }
+        thumbnailUrl: { type: ["string", "null"] }
+        previewVideoUrl: { type: ["string", "null"] }
+        version: { type: string }
+        fileSize: { type: ["string", "null"] }
+        views: { type: integer }
+        downloads: { type: integer }
+        favorites: { type: integer }
+        releaseDate: { type: string, format: date }
+        updatedAt: { type: string, format: date-time }
+        screenshots:
+          type: array
+          items: { type: string }
+        supportedDevices:
+          type: array
+          items: { type: string }
+        requirements:
+          type: array
+          items: { type: string }
+        whatsNew: { type: string }
+        changelog:
+          type: array
+          items: { type: string }
+        fileAvailable: { type: boolean }
+        videoLocked: { type: boolean }
+    ProjectDetail:
+      allOf:
+        - $ref: "#/components/schemas/Project"
+        - type: object
+          required: [isFavorite]
+          properties:
+            isFavorite: { type: boolean }
+    ProjectInput:
+      type: object
+      required: [slug, title, shortDescription, description, category, access]
+      properties:
+        slug: { type: string, minLength: 2, maxLength: 100 }
+        title: { type: string, minLength: 1, maxLength: 120 }
+        shortDescription: { type: string, minLength: 1, maxLength: 220 }
+        description: { type: string, minLength: 1, maxLength: 10000 }
+        category: { type: string, minLength: 1, maxLength: 60 }
+        tags:
+          type: array
+          items: { type: string, maxLength: 40 }
+        access: { type: string, enum: [free, premium] }
+        featured: { type: boolean }
+        isNew: { type: boolean }
+        thumbnailUrl: { type: ["string", "null"] }
+        previewVideoUrl: { type: ["string", "null"] }
+        version: { type: string, maxLength: 40 }
+        fileSize: { type: ["string", "null"] }
+        releaseDate: { type: string, format: date }
+        screenshots:
+          type: array
+          items: { type: string }
+        supportedDevices:
+          type: array
+          items: { type: string }
+        requirements:
+          type: array
+          items: { type: string }
+        whatsNew: { type: string }
+        changelog:
+          type: array
+          items: { type: string }
+    ProjectUpdate:
+      type: object
+      properties:
+        title: { type: string, minLength: 1, maxLength: 120 }
+        shortDescription: { type: string, minLength: 1, maxLength: 220 }
+        description: { type: string, minLength: 1, maxLength: 10000 }
+        category: { type: string, minLength: 1, maxLength: 60 }
+        tags:
+          type: array
+          items: { type: string, maxLength: 40 }
+        access: { type: string, enum: [free, premium] }
+        featured: { type: boolean }
+        isNew: { type: boolean }
+        thumbnailUrl: { type: ["string", "null"] }
+        previewVideoUrl: { type: ["string", "null"] }
+        version: { type: string, maxLength: 40 }
+        fileSize: { type: ["string", "null"] }
+        releaseDate: { type: string, format: date }
+        screenshots:
+          type: array
+          items: { type: string }
+        supportedDevices:
+          type: array
+          items: { type: string }
+        requirements:
+          type: array
+          items: { type: string }
+        whatsNew: { type: string }
+        changelog:
+          type: array
+          items: { type: string }
+    PublicationInput:
+      type: object
+      required: [published]
+      properties:
+        published: { type: boolean }
+    Account:
+      type: object
+      required: [userId, displayName, email, isAdmin, favoriteCount, downloadCount]
+      properties:
+        userId: { type: string }
+        displayName: { type: string }
+        email: { type: string }
+        isAdmin: { type: boolean }
+        favoriteCount: { type: integer }
+        downloadCount: { type: integer }
+    ActionResult:
+      type: object
+      required: [success]
+      properties:
+        success: { type: boolean }
+        message: { type: ["string", "null"] }
+    DownloadResult:
+      type: object
+      required: [success, downloadUrl]
+      properties:
+        success: { type: boolean }
+        downloadUrl: { type: ["string", "null"] }
+        message: { type: ["string", "null"] }
+    DownloadRecord:
+      type: object
+      required: [id, projectSlug, projectTitle, createdAt]
+      properties:
+        id: { type: string }
+        projectSlug: { type: string }
+        projectTitle: { type: string }
+        createdAt: { type: string, format: date-time }
+    Notification:
+      type: object
+      required: [id, title, message, createdAt, read]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        message: { type: string }
+        createdAt: { type: string, format: date-time }
+        read: { type: boolean }
+    Subscription:
+      type: object
+      required: [status, plan, premiumEnabled]
+      properties:
+        status: { type: string, enum: [inactive, active, cancelled, past_due] }
+        plan: { type: ["string", "null"] }
+        expiresAt: { type: ["string", "null"], format: date-time }
+        premiumEnabled: { type: boolean }
+    AdminOverview:
+      type: object
+      required: [projects, published, views, downloads, favorites, users, subscriptions, popular]
+      properties:
+        projects: { type: integer }
+        published: { type: integer }
+        views: { type: integer }
+        downloads: { type: integer }
+        favorites: { type: integer }
+        users: { type: integer }
+        subscriptions: { type: integer }
+        popular:
+          type: array
+          items: { $ref: "#/components/schemas/Project" }
