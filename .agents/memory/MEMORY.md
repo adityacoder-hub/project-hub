@@ -1,0 +1,1 @@
+- [pnpm dependency removal](pnpm-dependency-removal.md) — verify workspace manifests and lockfile after package-removal helpers; reported success may not remove declarations.
