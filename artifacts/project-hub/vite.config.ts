@@ -49,13 +49,18 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': path.resolve(import.meta.dirname, 'src'),
+      '@clerk/shared/loadClerkJsScript': path.resolve(
+        import.meta.dirname,
+        'src',
+        'clerk-shared-script-compat.ts',
+      ),
       '@assets': path.resolve(
         import.meta.dirname,
         '..',
         '..',
         'attached_assets',
       ),
+      '@': path.resolve(import.meta.dirname, 'src'),
     },
     dedupe: ['react', 'react-dom'],
   },
