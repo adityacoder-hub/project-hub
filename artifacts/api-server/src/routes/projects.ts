@@ -1,5 +1,4 @@
 import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
-import { getAuth } from "@clerk/express";
 import { Router, type IRouter } from "express";
 import {
   GetProjectParams,
@@ -17,6 +16,7 @@ import {
   isProjectFavorite,
   serializeProject,
 } from "../lib/project-hub-projects";
+import { getOptionalAuthUser } from "../lib/project-hub-auth";
 
 const router: IRouter = Router();
 
@@ -81,7 +81,7 @@ router.get("/projects/:slug", async (req, res): Promise<void> => {
     return;
   }
 
-  const userId = getAuth(req).userId;
+  const userId = getOptionalAuthUser(res)?.id;
   const [isFavorite, premiumAccess] = userId
     ? await Promise.all([
         isProjectFavorite(userId, project.id),
@@ -118,7 +118,7 @@ router.post("/projects/:slug/views", async (req, res): Promise<void> => {
 
   await db.insert(projectViewsTable).values({
     projectId: project.id,
-    userId: getAuth(req).userId ?? null,
+    userId: getOptionalAuthUser(res)?.id ?? null,
   });
   await db
     .update(projectsTable)
@@ -148,7 +148,7 @@ router.post("/projects/:slug/download", async (req, res): Promise<void> => {
     return;
   }
 
-  const userId = getAuth(req).userId;
+  const userId = getOptionalAuthUser(res)?.id;
   if (project.access === "premium") {
     if (!userId) {
       res.status(401).json({ error: "Sign in to check premium access" });

@@ -5,6 +5,57 @@
  * API for the owner-managed Project Hub catalog.
  * OpenAPI spec version: 0.1.0
  */
+export type AuthUserRole = typeof AuthUserRole[keyof typeof AuthUserRole];
+
+
+export const AuthUserRole = {
+  user: 'user',
+  admin: 'admin',
+} as const;
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  displayName: string;
+  role: AuthUserRole;
+}
+
+export interface AuthSession {
+  authenticated: boolean;
+  user: AuthUser | null;
+}
+
+export interface AuthResult {
+  user: AuthUser;
+}
+
+export interface LoginInput {
+  /** @maxLength 254 */
+  email: string;
+  /**
+     * @minLength 12
+     * @maxLength 128
+     */
+  password: string;
+}
+
+export interface RegistrationInput {
+  /** @maxLength 254 */
+  email: string;
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  displayName: string;
+  /**
+     * @minLength 12
+     * @maxLength 128
+     */
+  password: string;
+  /** @maxLength 512 */
+  ownerSetupToken?: string;
+}
+
 export interface HealthStatus {
   status: string;
 }

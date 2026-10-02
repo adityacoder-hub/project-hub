@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
-@layer theme, base, clerk, components, utilities;
+@layer theme, base, components, utilities;
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @plugin "@tailwindcss/typography";
@@ -505,7 +505,24 @@
 .auth-side-art { position: absolute; left: 8vw; right: 8vw; bottom: 48px; height: 190px; border-top: 1px solid rgba(244,241,231,.2); display: flex; align-items: end; padding-bottom: 13px; color: rgba(244,241,231,.48); font: 8px var(--app-font-mono); letter-spacing: .1em; }
 .auth-mini-orb { position: absolute; left: 42%; top: -72px; width: 145px; height: 145px; border-radius: 40% 60% 56% 44%; background: linear-gradient(145deg, #cee4d6, #79a99a 48%, #445d61); box-shadow: inset -12px -14px 20px rgba(20,40,40,.38), inset 8px 7px 15px rgba(255,255,255,.65), 10px 18px 30px rgba(0,0,0,.25); transform: rotate(-23deg); }
 .auth-form-side { display: flex; flex-direction: column; justify-content: center; align-items: center; min-width: 0; padding: 85px 35px 32px; }
-.auth-form-side > div { width: 100%; }
+.auth-form-side > div, .auth-form-side > form { width: 100%; max-width: 440px; }
+.auth-custom-form { display: flex; flex-direction: column; gap: 14px; padding: 34px; border: 1px solid hsl(var(--card-border)); border-radius: 18px; background: hsl(var(--card)); box-shadow: 0 24px 80px rgba(31,42,58,.1); }
+.auth-custom-form > .eyebrow { color: hsl(var(--accent)); }
+.auth-custom-form h2 { margin: -5px 0 -8px; color: hsl(var(--foreground)); font-size: 31px; font-weight: 800; letter-spacing: -.055em; }
+.auth-custom-form label { display: flex; flex-direction: column; gap: 6px; color: hsl(var(--foreground)); font-size: 11px; font-weight: 700; }
+.auth-custom-form input { width: 100%; min-height: 43px; padding: 10px 12px; border: 1px solid hsl(var(--input)); border-radius: 8px; background: hsl(var(--background)); color: hsl(var(--foreground)); font: 500 12px var(--app-font-sans); }
+.auth-custom-form input:focus { border-color: hsl(var(--accent)); outline: 2px solid hsl(var(--accent) / .14); }
+.auth-custom-form label small { color: hsl(var(--muted-foreground)); font-size: 9px; font-weight: 500; }
+.auth-form-copy { margin: -3px 0 2px; color: hsl(var(--muted-foreground)); font-size: 11px; line-height: 1.65; }
+.auth-submit { width: 100%; justify-content: center; margin-top: 3px; }
+.auth-switch { margin: 4px 0 0; color: hsl(var(--muted-foreground)); text-align: center; font-size: 10px; }
+.auth-switch a { color: hsl(var(--accent)); font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
+.auth-error { margin: 0; padding: 10px 12px; border: 1px solid hsl(var(--destructive) / .22); border-radius: 8px; background: hsl(var(--destructive) / .08); color: hsl(var(--destructive)); font-size: 10px; line-height: 1.5; }
+.owner-setup-toggle { display: flex; flex-direction: column; align-items: flex-start; gap: 11px; padding-top: 2px; }
+.owner-setup-toggle > button { color: hsl(var(--accent)); font-size: 10px; }
+.owner-setup-toggle > label { width: 100%; }
+.admin-access-note { margin: 0; color: hsl(var(--muted-foreground)); font-size: 11px; line-height: 1.6; }
+.auth-header-loading { display: block; width: 74px; height: 34px; border-radius: 999px; background: hsl(var(--muted)); opacity: .45; }
 .auth-footnote { max-width: 440px; margin: 22px auto 0; color: hsl(var(--muted-foreground)); font-size: 9px; line-height: 1.75; text-align: center; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 @media (max-width: 1280px) {
@@ -650,6 +667,7 @@
   .auth-side-art { left: 25px; right: 25px; bottom: 0; height: 75px; align-items: end; }
   .auth-mini-orb { width: 72px; height: 72px; left: auto; right: 16px; top: -32px; }
   .auth-form-side { padding: 38px 18px 27px; }
+  .auth-custom-form { padding: 27px 22px; }
   .auth-footnote { max-width: 400px; }
 }
 @media (max-width: 390px) {

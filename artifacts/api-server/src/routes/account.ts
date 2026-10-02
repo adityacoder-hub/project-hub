@@ -21,13 +21,12 @@ import {
   subscriptionsTable,
 } from "@workspace/db";
 import {
-  clerkProfile,
   hasPremiumAccess,
   serializeProject,
 } from "../lib/project-hub-projects";
 import {
+  getRequestAuthUser,
   getRequestUserId,
-  isOwnerUser,
   requireUser,
 } from "../lib/project-hub-auth";
 
@@ -35,8 +34,9 @@ const router: IRouter = Router();
 router.use("/me", requireUser);
 
 router.get("/me", async (_req, res): Promise<void> => {
-  const userId = getRequestUserId(res);
-  const profile = await clerkProfile(userId);
+  const user = getRequestAuthUser(res);
+  const userId = user.id;
+  const profile = { email: user.email, displayName: user.displayName };
   await db
     .insert(profilesTable)
     .values({ userId, ...profile })
@@ -55,13 +55,12 @@ router.get("/me", async (_req, res): Promise<void> => {
       .from(downloadsTable)
       .where(eq(downloadsTable.userId, userId)),
   ]);
-  const isAdmin = await isOwnerUser(userId);
   res.json(
     GetAccountResponse.parse({
       userId,
       displayName: profile.displayName,
       email: profile.email,
-      isAdmin,
+      isAdmin: user.role === "admin",
       favoriteCount: favoriteRows.length,
       downloadCount: downloadRows.length,
     }),

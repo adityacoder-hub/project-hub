@@ -1,15 +1,16 @@
-# [Project name]
+# Project Hub Preview
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+An owner-curated catalog for browsing original software projects, with personal accounts and a private owner studio.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/api-server run dev` — run the API server
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- Required env: `DATABASE_URL`, `PROJECT_HUB_OWNER_EMAIL`, `PROJECT_HUB_ADMIN_SETUP_TOKEN`
+- `PROJECT_HUB_ADMIN_SETUP_TOKEN` is a Replit Secret with at least 32 characters; keep it private and use it only for the first owner account setup.
 
 ## Stack
 
@@ -22,23 +23,30 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `lib/db/src/schema/project-hub.ts` — catalog, account, subscription, and session tables
+- `lib/api-spec/openapi.yaml` — API contract; generated client hooks and validation live in the workspace libraries
+- `artifacts/api-server/src/lib/project-hub-auth.ts` — password hashing, sessions, and server-side authorization
+- `artifacts/project-hub/src/App.tsx` — catalog pages and account flows
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Authentication is custom and database-backed: scrypt password hashes and random opaque session tokens stored as hashes, delivered through HttpOnly cookies.
+- The first administrator account requires both `PROJECT_HUB_OWNER_EMAIL` and `PROJECT_HUB_ADMIN_SETUP_TOKEN`; sign-up never grants administrator access by itself.
+- Development schema changes use `pnpm --filter @workspace/db run push`; do not apply them to production without an explicit request.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Visitors can browse the owner-curated catalog. Signed-in users can save favorites and view their account activity and access status.
+- Only the owner administrator can add, edit, publish, unpublish, or delete projects. Regular accounts must never receive project-management permissions.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Do not use Clerk or another paid authentication provider.
+- Do not rely on localStorage as the sole security mechanism for authentication or premium access.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Set the owner email and the 32+ character setup secret before creating the administrator account; only one administrator is allowed.
 
 ## Pointers
 

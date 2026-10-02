@@ -1,4 +1,3 @@
-import { clerkClient } from "@clerk/express";
 import { and, eq } from "drizzle-orm";
 import {
   ListProjectsResponseItem,
@@ -103,24 +102,4 @@ export async function serializeProject(
   return (options.isFavorite === undefined
     ? ListProjectsResponseItem.parse(result)
     : GetProjectResponse.parse(result)) as ProjectOutput;
-}
-
-export async function clerkProfile(userId: string): Promise<{
-  email: string;
-  displayName: string;
-}> {
-  const user = await clerkClient.users.getUser(userId);
-  const primaryEmail = user.emailAddresses.find(
-    (email) => email.id === user.primaryEmailAddressId,
-  );
-  const email =
-    primaryEmail?.emailAddress ??
-    user.emailAddresses[0]?.emailAddress ??
-    "";
-  const displayName =
-    [user.firstName, user.lastName].filter(Boolean).join(" ") ||
-    user.username ||
-    email.split("@")[0] ||
-    "Project Hub user";
-  return { email, displayName };
 }

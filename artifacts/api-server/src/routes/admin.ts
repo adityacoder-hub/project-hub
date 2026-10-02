@@ -17,19 +17,19 @@ import {
 } from "@workspace/api-zod";
 import {
   adminActionsTable,
+  authUsersTable,
   db,
-  profilesTable,
   projectsTable,
   subscriptionsTable,
 } from "@workspace/db";
-import { getRequestUserId, requireOwner } from "../lib/project-hub-auth";
+import { getRequestUserId, requireAdmin } from "../lib/project-hub-auth";
 import {
   safeMediaUrl,
   serializeProject,
 } from "../lib/project-hub-projects";
 
 const router: IRouter = Router();
-router.use("/admin", requireOwner);
+router.use("/admin", requireAdmin);
 
 function isSafeSlug(slug: string): boolean {
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
@@ -79,7 +79,7 @@ router.get("/admin/overview", async (_req, res): Promise<void> => {
       favorites: sql<number>`coalesce(sum(${projectsTable.favorites}), 0)::int`,
     })
     .from(projectsTable);
-  const [users] = await db.select({ count: count() }).from(profilesTable);
+  const [users] = await db.select({ count: count() }).from(authUsersTable);
   const [subscriptions] = await db
     .select({ count: count() })
     .from(subscriptionsTable)

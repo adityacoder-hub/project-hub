@@ -1,22 +1,19 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
-import { ClerkProvider, SignIn, SignUp, useClerk, useUser } from '@clerk/react';
-import { publishableKeyFromHost } from '@clerk/shared/keys';
-import { shadcn } from '@clerk/themes';
 import {
   ArrowDownToLine, ArrowLeft, ArrowRight, ArrowUpRight, Bell, Check, ChevronDown,
   CircleHelp, Command, Eye, FileQuestion, Filter, Heart, Layers3, LockKeyhole,
   Menu, Moon, Search, Settings2, ShieldCheck, Sparkles, Sun, X,
 } from 'lucide-react';
 import {
-  getGetAccountQueryKey, getGetAdminOverviewQueryKey, getGetProjectQueryKey,
+  getGetAccountQueryKey, getGetAdminOverviewQueryKey, getGetAuthSessionQueryKey, getGetProjectQueryKey,
   getGetSubscriptionQueryKey, getHealthCheckQueryKey, getListAdminProjectsQueryKey,
   getListDownloadsQueryKey, getListFavoritesQueryKey, getListNotificationsQueryKey,
   getListProjectsQueryKey, useArchiveProject, useCreateProject, useGetAccount,
-  useGetAdminOverview, useGetProject, useGetSubscription, useHealthCheck,
+  useGetAdminOverview, useGetAuthSession, useGetProject, useGetSubscription, useHealthCheck,
   useListAdminProjects, useListDownloads, useListFavorites, useListNotifications,
   useListProjects, useRecordProjectView, useRemoveFavorite, useRequestProjectDownload,
-  useSaveFavorite, useSetProjectPublication, useUpdateProject,
+  useSaveFavorite, useSetProjectPublication, useSignIn, useSignOut, useSignUp, useUpdateProject,
 } from '@workspace/api-client-react';
 import type { Project, ProjectInput, ProjectUpdate } from '@workspace/api-client-react';
 import { Link, Redirect, Route, Switch, Router as WouterRouter, useLocation } from 'wouter';
@@ -27,61 +24,6 @@ import './index.css';
 
 const queryClient = new QueryClient();
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
-const clerkPubKey = publishableKeyFromHost(window.location.hostname, import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
-const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
-
-function stripBase(path: string) {
-  return basePath && path.startsWith(basePath) ? path.slice(basePath.length) || '/' : path;
-}
-
-const clerkAppearance = {
-  theme: shadcn,
-  cssLayerName: 'clerk',
-  options: {
-    logoPlacement: 'inside' as const,
-    logoLinkUrl: basePath || '/',
-    logoImageUrl: `${window.location.origin}${basePath}/logo.svg`,
-  },
-  variables: {
-    colorPrimary: '#287f70',
-    colorForeground: '#253147',
-    colorMutedForeground: '#677184',
-    colorDanger: '#bb4e49',
-    colorBackground: '#fbfaf6',
-    colorInput: '#fffefa',
-    colorInputForeground: '#253147',
-    colorNeutral: '#d7d9dc',
-    fontFamily: 'Manrope, sans-serif',
-    borderRadius: '12px',
-  },
-  elements: {
-    rootBox: 'w-full flex justify-center',
-    cardBox: 'bg-[#fbfaf6] border border-[#e1e0da] rounded-2xl w-[440px] max-w-full overflow-hidden shadow-[0_24px_80px_rgba(31,42,58,.12)]',
-    card: '!shadow-none !border-0 !bg-transparent !rounded-none',
-    footer: '!shadow-none !border-0 !bg-transparent !rounded-none',
-    headerTitle: 'text-[#253147] font-extrabold tracking-[-.04em]',
-    headerSubtitle: 'text-[#677184]',
-    socialButtonsBlockButtonText: 'text-[#253147] font-semibold',
-    formFieldLabel: 'text-[#344057] font-semibold',
-    footerActionLink: 'text-[#287f70] font-bold',
-    footerActionText: 'text-[#677184]',
-    dividerText: 'text-[#7b8492]',
-    identityPreviewEditButton: 'text-[#287f70]',
-    formFieldSuccessText: 'text-[#287f70]',
-    alertText: 'text-[#253147]',
-    logoBox: 'rounded-xl',
-    logoImage: 'h-10 w-10 rounded-xl',
-    socialButtonsBlockButton: 'border-[#d7d9dc] bg-[#fffefa] hover:bg-[#f2f2ec]',
-    formButtonPrimary: 'bg-[#287f70] hover:bg-[#20695d] text-white shadow-none',
-    formFieldInput: 'bg-[#fffefa] border-[#d7d9dc] text-[#253147]',
-    footerAction: 'border-t border-[#e4e3dc]',
-    dividerLine: 'bg-[#e1e0da]',
-    alert: 'border-[#ead7d3] bg-[#fbf1ef]',
-    otpCodeFieldInput: 'bg-[#fffefa] border-[#d7d9dc]',
-    formFieldRow: 'gap-2',
-    main: 'gap-5',
-  },
-};
 
 function ThemeControl() {
   const [dark, setDark] = useState(false);
@@ -116,10 +58,19 @@ function SearchBox({ compact = false }: { compact?: boolean }) {
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { isSignedIn, user } = useUser();
-  const { signOut } = useClerk();
-  const [location] = useLocation();
+  const { isSignedIn, isLoaded, user } = useAuthAccount();
+  const signOut = useSignOut();
+  const client = useQueryClient();
+  const [location, setLocation] = useLocation();
   const links = [['Explore', '/projects'], ['Free', '/free'], ['Premium', '/premium'], ['About', '/about']] as const;
+  function handleSignOut() {
+    signOut.mutate(undefined, {
+      onSuccess: () => {
+        client.clear();
+        setLocation('/');
+      },
+    });
+  }
   return <header className="site-header">
     <div className="header-inner">
       <Link href="/" className="brand" aria-label="Project Hub home" data-testid="link-brand-home">
@@ -133,9 +84,9 @@ function Header() {
         <div className="header-search"><SearchBox compact /></div>
         <ThemeControl />
         {isSignedIn ? <div className="user-menu">
-          <Link href="/account" className="avatar-chip" title="Your account" data-testid="link-account-avatar">{user?.firstName?.[0] || user?.emailAddresses?.[0]?.emailAddress?.[0] || 'A'}</Link>
-          <button onClick={() => signOut({ redirectUrl: basePath || '/' })} className="text-button signout-button" data-testid="button-sign-out">Sign out</button>
-        </div> : <Link href="/sign-in" className="button button-dark header-signin" data-testid="link-sign-in">Sign in</Link>}
+          <Link href="/account" className="avatar-chip" title="Your account" data-testid="link-account-avatar">{user?.displayName?.[0] || user?.email?.[0] || 'A'}</Link>
+          <button onClick={handleSignOut} disabled={signOut.isPending} className="text-button signout-button" data-testid="button-sign-out">{signOut.isPending ? 'Signing out…' : 'Sign out'}</button>
+        </div> : isLoaded ? <Link href="/sign-in" className="button button-dark header-signin" data-testid="link-sign-in">Sign in</Link> : <span className="auth-header-loading" aria-label="Checking sign-in status" />}
         <button className="icon-button mobile-menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-label={menuOpen ? 'Close menu' : 'Open menu'} data-testid="button-mobile-menu">{menuOpen ? <X size={19} /> : <Menu size={19} />}</button>
       </div>
     </div>
@@ -210,9 +161,25 @@ function ProjectCard({ project, showFavorite = false, favorite = false, onFavori
 }
 
 function useAuthAccount() {
-  const { isSignedIn } = useUser();
-  const account = useGetAccount({ query: { enabled: !!isSignedIn, queryKey: getGetAccountQueryKey(), retry: false } });
-  return { isSignedIn: !!isSignedIn, account };
+  const session = useGetAuthSession({
+    query: { queryKey: getGetAuthSessionQueryKey(), retry: false },
+  });
+  const user = session.data?.user ?? null;
+  const isSignedIn = session.data?.authenticated === true && Boolean(user);
+  const account = useGetAccount({
+    query: {
+      enabled: isSignedIn,
+      queryKey: getGetAccountQueryKey(),
+      retry: false,
+    },
+  });
+  return {
+    isSignedIn,
+    isLoaded: !session.isLoading,
+    user,
+    account,
+    session,
+  };
 }
 
 function FavoriteControl({ slug, initial }: { slug: string; initial: boolean }) {
@@ -346,14 +313,13 @@ function SignedOutPrompt({ title, copy }: { title: string; copy: string }) {
 }
 
 function AccountPage() {
-  const { isSignedIn, account } = useAuthAccount();
-  const { user } = useUser();
+  const { isSignedIn, user, account } = useAuthAccount();
   if (!isSignedIn) return <Shell><div className="content-page"><PageHeading kicker="YOUR ACCOUNT" title="A place for your projects." copy="Sign in to see your saved projects and account details." /><SignedOutPrompt title="Your account lives here" copy="Sign in to keep track of favorite releases and download history." /></div></Shell>;
   if (account.isLoading) return <Shell><div className="content-page"><div className="skeleton skeleton-line" /><div className="skeleton account-skeleton" /></div></Shell>;
   if (account.isError) return <Shell><div className="content-page"><PageHeading title="Your account" /><ErrorState message="We couldn't load your account details. Your sign-in may have expired." onRetry={() => account.refetch()} /></div></Shell>;
   const data = account.data;
   return <Shell><div className="content-page"><PageHeading kicker="YOUR ACCOUNT" title={`Good to see you${data?.displayName ? `, ${data.displayName.split(' ')[0]}` : ''}.`} copy="Your personal corner of the catalog." />
-    <div className="account-card"><div className="account-identity"><span className="account-avatar">{data?.displayName?.[0] || user?.firstName?.[0] || 'P'}</span><div><h2>{data?.displayName || 'Project Hub member'}</h2><p>{data?.email || user?.primaryEmailAddress?.emailAddress}</p></div>{data?.isAdmin && <span className="owner-badge"><ShieldCheck size={14} /> Owner</span>}</div><div className="account-numbers"><div><span>{data?.favoriteCount ?? 0}</span><small>Favorites</small></div><div><span>{data?.downloadCount ?? 0}</span><small>Downloads</small></div><div><span>Active</span><small>Account</small></div></div></div>
+     <div className="account-card"><div className="account-identity"><span className="account-avatar">{data?.displayName?.[0] || user?.displayName?.[0] || 'P'}</span><div><h2>{data?.displayName || user?.displayName || 'Project Hub member'}</h2><p>{data?.email || user?.email}</p></div>{data?.isAdmin && <span className="owner-badge"><ShieldCheck size={14} /> Owner</span>}</div><div className="account-numbers"><div><span>{data?.favoriteCount ?? 0}</span><small>Favorites</small></div><div><span>{data?.downloadCount ?? 0}</span><small>Downloads</small></div><div><span>Active</span><small>Account</small></div></div></div>
     <div className="account-links"><Link href="/favorites" className="account-link"><span className="account-link-icon"><Heart /></span><span><b>Saved projects</b><small>Pick up where your curiosity left off.</small></span><ArrowRight size={17} /></Link><Link href="/downloads" className="account-link"><span className="account-link-icon"><ArrowDownToLine /></span><span><b>Download history</b><small>Revisit releases you've requested.</small></span><ArrowRight size={17} /></Link><Link href="/notifications" className="account-link"><span className="account-link-icon"><Bell /></span><span><b>Notifications</b><small>Updates from the catalog.</small></span><ArrowRight size={17} /></Link><Link href="/subscription" className="account-link"><span className="account-link-icon"><Settings2 /></span><span><b>Access & subscription</b><small>See your current access status.</small></span><ArrowRight size={17} /></Link></div>
   </div></Shell>;
 }
@@ -393,13 +359,13 @@ function SubscriptionPage() {
 function AboutPage() {
   return <Shell><div className="content-page editorial-page"><PageHeading kicker="A NOTE FROM THE MAKER" title={<>An independent home<br />for useful ideas.</>} copy="Project Hub is a focused launchpad for original tools and creative software." />
     <div className="editorial-lead"><span className="large-quote">“</span><p>Everything here started with a small problem worth solving — and enough curiosity to build a tool around it.</p></div>
-    <div className="editorial-grid"><section><span className="eyebrow">01 / THE COLLECTION</span><h2>Not a marketplace.</h2><p>Project Hub is an owner-curated catalog, not a public submission directory. Each listed release is an original project made and maintained by the owner.</p></section><section><span className="eyebrow">02 / CLEAR ACCESS</span><h2>Know before you open.</h2><p>Each project page explains whether a release is free or premium, plus the version, requirements, and file availability when that information exists.</p></section><section><span className="eyebrow">03 / THE ACCOUNT</span><h2>Your saved corner.</h2><p>Visitors can browse the catalog. Sign in to save favorites and see account history. Owner publishing tools are limited to an allowlisted owner account.</p></section></div>
+    <div className="editorial-grid"><section><span className="eyebrow">01 / THE COLLECTION</span><h2>Not a marketplace.</h2><p>Project Hub is an owner-curated catalog, not a public submission directory. Each listed release is an original project made and maintained by the owner.</p></section><section><span className="eyebrow">02 / CLEAR ACCESS</span><h2>Know before you open.</h2><p>Each project page explains whether a release is free or premium, plus the version, requirements, and file availability when that information exists.</p></section><section><span className="eyebrow">03 / THE ACCOUNT</span><h2>Your saved corner.</h2><p>Visitors can browse the catalog. Sign in to save favorites and see account history. Only the owner administrator can manage releases.</p></section></div>
     <section className="editorial-end"><div className="eyebrow">ALWAYS IN PROGRESS</div><h2>Small releases.<br />Real intent.</h2><Link href="/projects" className="button button-dark">Explore what’s here <ArrowRight size={15} /></Link></section>
   </div></Shell>;
 }
 
 const legalCopy: Record<string, { title: string; label: string; paragraphs: string[] }> = {
-  privacy: { title: 'Privacy, without the fine print fog.', label: 'PRIVACY', paragraphs: ['Project Hub uses account information to provide sign-in, favorites, download history, and related account features. Information is handled to operate the catalog and its services.', 'Project details and account features may rely on service providers that support hosting and authentication. This page does not promise that no operational data is processed.', 'For a privacy question or request, use the contact method made available by the owner. A response channel is not configured in this catalog yet.'] },
+  privacy: { title: 'Privacy, without the fine print fog.', label: 'PRIVACY', paragraphs: ['Project Hub uses account information to provide sign-in, favorites, download history, and related account features. Passwords are stored as scrypt hashes, and sign-in sessions are held server-side with an HttpOnly cookie in the browser.', 'Project details and account data are stored to operate the catalog. Hosting and operational services may process limited technical data needed to run the site.', 'For a privacy question or request, use the contact method made available by the owner. A response channel is not configured in this catalog yet.'] },
   terms: { title: 'A few clear terms.', label: 'TERMS OF USE', paragraphs: ['Project Hub presents owner-created software releases for browsing and, where available, access. Project information is provided for the specific release shown.', 'Do not misuse the site, attempt to interfere with its operation, or use a release in a way that violates applicable law. Each project may have additional terms shown with that release.', 'The owner may update, withdraw, or archive a release. Availability and project details can change over time.'] },
   refunds: { title: 'Refund information.', label: 'REFUNDS', paragraphs: ['Project Hub does not process purchases or subscription changes through this interface. No checkout or payment flow is available here.', 'If a premium purchase was made through another channel, refund eligibility is governed by the terms of that purchase channel. No refund request form is available in this catalog.'] },
   disclaimer: { title: 'Useful context before you use a release.', label: 'DISCLAIMER', paragraphs: ['Projects are provided as described on their individual pages. Compatibility, requirements, and availability can vary by release and may change with updates.', 'Unless a project page says otherwise, information is supplied for general guidance. The catalog does not guarantee uninterrupted availability or suitability for a particular purpose.', 'A visible download control is enabled only when the API indicates that a file is available. A missing file is not replaced with a placeholder download.'] },
@@ -411,8 +377,8 @@ function LegalPage({ page }: { page: keyof typeof legalCopy }) {
 }
 
 function AdminLoginPage() {
-  const { isSignedIn } = useUser();
-  return <Shell><div className="content-page owner-access-page"><div className="owner-access-card"><span className="owner-access-mark"><ShieldCheck /></span><div className="eyebrow">OWNER ACCESS</div><h1>Behind the catalog.</h1><p>Publishing controls are reserved for the allowlisted owner. Sign in with the owner account to continue; authorization is confirmed by the server.</p>{isSignedIn ? <Link className="button button-dark" href="/admin">Continue to owner studio <ArrowRight size={15} /></Link> : <Link className="button button-dark" href="/sign-in">Sign in to continue <ArrowRight size={15} /></Link>}<Link href="/" className="text-link">Return to the public catalog <ArrowLeft size={14} /></Link></div></div></Shell>;
+  const { isSignedIn, user } = useAuthAccount();
+  return <Shell><div className="content-page owner-access-page"><div className="owner-access-card"><span className="owner-access-mark"><ShieldCheck /></span><div className="eyebrow">OWNER ACCESS</div><h1>Behind the catalog.</h1><p>Project management is reserved for the owner administrator account. The server checks this account's role before every management action.</p>{isSignedIn && user?.role === 'admin' ? <Link className="button button-dark" href="/admin">Continue to owner studio <ArrowRight size={15} /></Link> : isSignedIn ? <p className="admin-access-note">This account does not have project-management access.</p> : <Link className="button button-dark" href="/sign-in">Sign in to continue <ArrowRight size={15} /></Link>}<Link href="/" className="text-link">Return to the public catalog <ArrowLeft size={14} /></Link></div></div></Shell>;
 }
 
 function AdminPage() {
@@ -437,7 +403,7 @@ function AdminPage() {
   const [success, setSuccess] = useState('');
   if (!isSignedIn) return <Redirect to="/admin/login" />;
   if (account.isLoading) return <Shell><div className="content-page"><div className="skeleton account-skeleton" /></div></Shell>;
-  if (account.isError || !isOwner) return <Shell><div className="content-page"><div className="owner-denied"><ShieldCheck size={24} /><div className="eyebrow">OWNER STUDIO</div><h1>Access not available.</h1><p>This account is not authorized to manage the catalog. Owner access is controlled by the server allowlist.</p><Link href="/projects" className="button button-outline">Back to public catalog</Link></div></div></Shell>;
+  if (account.isError || !isOwner) return <Shell><div className="content-page"><div className="owner-denied"><ShieldCheck size={24} /><div className="eyebrow">OWNER STUDIO</div><h1>Access not available.</h1><p>This account does not have the administrator role required to manage the catalog.</p><Link href="/projects" className="button button-outline">Back to public catalog</Link></div></div></Shell>;
   function resetForm() { setCreating(false); setEditing(null); setTitle(''); setSlug(''); setShortDescription(''); setDescription(''); setCategory(''); setAccess('free'); setFormError(''); }
   function startEdit(p: Project) { setEditing(p); setCreating(false); setTitle(p.title); setSlug(p.slug); setShortDescription(p.shortDescription); setDescription(p.description); setCategory(p.category); setAccess(p.access); setSuccess(''); }
   function submitProject(e: FormEvent) {
@@ -471,8 +437,80 @@ function AdminPage() {
   </div></Shell>;
 }
 
+function authErrorMessage(error: unknown, fallback: string) {
+  if (error && typeof error === 'object' && 'data' in error) {
+    const data = (error as { data?: unknown }).data;
+    if (data && typeof data === 'object' && 'error' in data) {
+      const message = (data as { error?: unknown }).error;
+      if (typeof message === 'string' && message.trim()) return message;
+    }
+  }
+  return fallback;
+}
+
 function AuthPage({ kind }: { kind: 'signin' | 'signup' }) {
-  return <div className="auth-page"><Link href="/" className="auth-back"><ArrowLeft size={14} /> Project Hub</Link><div className="auth-side"><div className="eyebrow">A SMALL CATALOG, YOURS TO KEEP</div><h1>Make space for<br /><em>good tools.</em></h1><p>Sign in to save thoughtful software for later.</p><div className="auth-side-art"><div className="auth-mini-orb" /><span>INDEPENDENT / ORIGINAL / OWNER CURATED</span></div></div><div className="auth-form-side">{kind === 'signin' ? <SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} /> : <SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} />}<p className="auth-footnote">Project Hub accounts are for browsing, favorites, and account history. Owner access is separately allowlisted.</p></div></div>;
+  const [, setLocation] = useLocation();
+  const client = useQueryClient();
+  const { isLoaded, isSignedIn } = useAuthAccount();
+  const signIn = useSignIn();
+  const signUp = useSignUp();
+  const [displayName, setDisplayName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [ownerSetupToken, setOwnerSetupToken] = useState('');
+  const [showOwnerSetup, setShowOwnerSetup] = useState(false);
+  const [error, setError] = useState('');
+  const busy = signIn.isPending || signUp.isPending;
+
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    setError('');
+    try {
+      if (kind === 'signin') {
+        await signIn.mutateAsync({ data: { email, password } });
+      } else {
+        await signUp.mutateAsync({
+          data: {
+            email,
+            displayName,
+            password,
+            ...(ownerSetupToken ? { ownerSetupToken } : {}),
+          },
+        });
+      }
+      client.clear();
+      setLocation('/account');
+    } catch (submitError) {
+      setError(authErrorMessage(
+        submitError,
+        kind === 'signin' ? 'Email or password is incorrect.' : 'The account could not be created. Please check the details and try again.',
+      ));
+    }
+  }
+
+  if (isLoaded && isSignedIn) return <Redirect to="/account" />;
+  return <div className="auth-page">
+    <Link href="/" className="auth-back"><ArrowLeft size={14} /> Project Hub</Link>
+    <div className="auth-side"><div className="eyebrow">A SMALL CATALOG, YOURS TO KEEP</div><h1>Make space for<br /><em>good tools.</em></h1><p>Sign in to save thoughtful software for later.</p><div className="auth-side-art"><div className="auth-mini-orb" /><span>INDEPENDENT / ORIGINAL / OWNER CURATED</span></div></div>
+    <div className="auth-form-side">
+      <form className="auth-custom-form" onSubmit={submit}>
+        <div className="eyebrow">{kind === 'signin' ? 'YOUR ACCOUNT' : 'GET STARTED'}</div>
+        <h2>{kind === 'signin' ? 'Welcome back.' : 'Create your account.'}</h2>
+        <p className="auth-form-copy">{kind === 'signin' ? 'Sign in to return to your saved projects.' : 'Save favorites and keep your account history in one place.'}</p>
+        {kind === 'signup' && <label htmlFor="auth-display-name">Name<input id="auth-display-name" name="displayName" autoComplete="name" value={displayName} onChange={e => setDisplayName(e.target.value)} required maxLength={100} data-testid="input-signup-name" /></label>}
+        <label htmlFor="auth-email">Email<input id="auth-email" name="email" type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} required maxLength={254} data-testid={`input-${kind}-email`} /></label>
+        <label htmlFor="auth-password">Password<input id="auth-password" name="password" type="password" autoComplete={kind === 'signin' ? 'current-password' : 'new-password'} value={password} onChange={e => setPassword(e.target.value)} required minLength={12} maxLength={128} data-testid={`input-${kind}-password`} /><small>Use at least 12 characters.</small></label>
+        {kind === 'signup' && <div className="owner-setup-toggle">
+          <button type="button" className="text-button" onClick={() => setShowOwnerSetup(value => !value)} aria-expanded={showOwnerSetup}>{showOwnerSetup ? 'Hide owner setup' : 'Setting up the owner account?'}</button>
+          {showOwnerSetup && <label htmlFor="owner-setup-token">Owner setup code<input id="owner-setup-token" name="ownerSetupToken" type="password" autoComplete="off" value={ownerSetupToken} onChange={e => setOwnerSetupToken(e.target.value)} maxLength={512} /><small>Only the configured owner email can use this one-time setup code.</small></label>}
+        </div>}
+        {error && <p className="auth-error" role="alert">{error}</p>}
+        <button type="submit" className="button button-dark auth-submit" disabled={busy} data-testid={`button-${kind}-submit`}>{busy ? 'Please wait…' : kind === 'signin' ? 'Sign in' : 'Create account'} <ArrowRight size={15} /></button>
+        <p className="auth-switch">{kind === 'signin' ? <>New to Project Hub? <Link href="/sign-up">Create an account</Link></> : <>Already have an account? <Link href="/sign-in">Sign in</Link></>}</p>
+      </form>
+      <p className="auth-footnote">Accounts use server-side sessions. Only the owner administrator can manage projects.</p>
+    </div>
+  </div>;
 }
 
 function NotFoundPage() {
@@ -480,7 +518,7 @@ function NotFoundPage() {
 }
 
 function HomeRoute() {
-  const { isLoaded, isSignedIn } = useUser();
+  const { isLoaded, isSignedIn } = useAuthAccount();
   if (isLoaded && isSignedIn) return <Redirect to="/account" />;
   return <HomePage />;
 }
@@ -488,18 +526,6 @@ function HomeRoute() {
 function RoutedErrorBoundary({ children }: { children: ReactNode }) {
   const [location] = useLocation();
   return <ErrorBoundary resetKey={location}>{children}</ErrorBoundary>;
-}
-
-function ClerkQueryCacheSync() {
-  const { addListener } = useClerk();
-  const client = useQueryClient();
-  const previousUserId = useRef<string | null | undefined>(undefined);
-  useEffect(() => addListener(({ user }) => {
-    const userId = user?.id ?? null;
-    if (previousUserId.current !== undefined && previousUserId.current !== userId) client.clear();
-    previousUserId.current = userId;
-  }), [addListener, client]);
-  return null;
 }
 
 function Router() {
@@ -528,15 +554,8 @@ function Router() {
   </Switch></RoutedErrorBoundary>;
 }
 
-function ClerkRoutes() {
-  const [, setLocation] = useLocation();
-  return <ClerkProvider publishableKey={clerkPubKey} proxyUrl={clerkProxyUrl} appearance={clerkAppearance} signInUrl={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} localization={{ signIn: { start: { title: 'Welcome back', subtitle: 'Sign in to return to your saved projects' } }, signUp: { start: { title: 'Make a little space for good tools', subtitle: 'Create your Project Hub account' } } }} routerPush={(to: string) => setLocation(stripBase(to))} routerReplace={(to: string) => setLocation(stripBase(to), { replace: true })}>
-    <QueryClientProvider client={queryClient}><ClerkQueryCacheSync /><TooltipProvider><Router /><Toaster /></TooltipProvider></QueryClientProvider>
-  </ClerkProvider>;
-}
-
 function App() {
-  return <WouterRouter base={basePath}><ClerkRoutes /></WouterRouter>;
+  return <WouterRouter base={basePath}><QueryClientProvider client={queryClient}><TooltipProvider><Router /><Toaster /></TooltipProvider></QueryClientProvider></WouterRouter>;
 }
 
 export default App;

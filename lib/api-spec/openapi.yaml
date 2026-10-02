@@ -10,6 +10,7 @@ servers:
 tags:
   - name: health
   - name: projects
+  - name: authentication
   - name: account
   - name: admin
 paths:
@@ -99,11 +100,79 @@ paths:
           description: Sign-in or an active premium entitlement is required
         "403":
           description: The project file is unavailable or access is not allowed
+  /auth/session:
+    get:
+      operationId: getAuthSession
+      tags: [authentication]
+      summary: Get the current session, if one exists
+      responses:
+        "200":
+          description: Current authentication state
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthSession" }
+  /auth/sign-up:
+    post:
+      operationId: signUp
+      tags: [authentication]
+      summary: Create an account and start a session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RegistrationInput" }
+      responses:
+        "201":
+          description: Account created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthResult" }
+        "400":
+          description: Invalid registration details or owner setup code
+        "409":
+          description: Account or owner account already exists
+        "503":
+          description: Owner account setup is not configured securely
+        "429":
+          description: Too many registration attempts
+  /auth/sign-in:
+    post:
+      operationId: signIn
+      tags: [authentication]
+      summary: Sign in and create a session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LoginInput" }
+      responses:
+        "200":
+          description: Signed in
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthResult" }
+        "401":
+          description: Email or password is incorrect
+        "429":
+          description: Too many sign-in attempts
+  /auth/sign-out:
+    post:
+      operationId: signOut
+      tags: [authentication]
+      summary: Revoke the current session
+      responses:
+        "200":
+          description: Signed out
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ActionResult" }
   /me:
     get:
       operationId: getAccount
       tags: [account]
       summary: Get the signed-in account
+      security:
+        - sessionCookie: []
       responses:
         "200":
           description: Account profile and role
@@ -117,6 +186,8 @@ paths:
       operationId: listFavorites
       tags: [account]
       summary: List the signed-in user's favorites
+      security:
+        - sessionCookie: []
       responses:
         "200":
           description: Favorite projects
@@ -132,6 +203,8 @@ paths:
       operationId: saveFavorite
       tags: [account]
       summary: Save a project to favorites
+      security:
+        - sessionCookie: []
       parameters:
         - $ref: "#/components/parameters/Slug"
       responses:
@@ -146,6 +219,8 @@ paths:
       operationId: removeFavorite
       tags: [account]
       summary: Remove a project from favorites
+      security:
+        - sessionCookie: []
       parameters:
         - $ref: "#/components/parameters/Slug"
       responses:
@@ -161,6 +236,8 @@ paths:
       operationId: listDownloads
       tags: [account]
       summary: List the signed-in user's download history
+      security:
+        - sessionCookie: []
       responses:
         "200":
           description: Download history
@@ -176,6 +253,8 @@ paths:
       operationId: listNotifications
       tags: [account]
       summary: List account notifications
+      security:
+        - sessionCookie: []
       responses:
         "200":
           description: Notifications
@@ -191,6 +270,8 @@ paths:
       operationId: getSubscription
       tags: [account]
       summary: Get premium subscription status
+      security:
+        - sessionCookie: []
       responses:
         "200":
           description: Subscription state
@@ -204,6 +285,8 @@ paths:
       operationId: getAdminOverview
       tags: [admin]
       summary: Get owner dashboard metrics
+      security:
+        - sessionCookie: []
       responses:
         "200":
           description: Analytics overview
@@ -219,6 +302,8 @@ paths:
       operationId: listAdminProjects
       tags: [admin]
       summary: List all projects including drafts
+      security:
+        - sessionCookie: []
       responses:
         "200":
           description: Owner's projects
@@ -235,6 +320,8 @@ paths:
       operationId: createProject
       tags: [admin]
       summary: Create a project draft
+      security:
+        - sessionCookie: []
       requestBody:
         required: true
         content:
@@ -257,6 +344,8 @@ paths:
       operationId: updateProject
       tags: [admin]
       summary: Update a project
+      security:
+        - sessionCookie: []
       parameters:
         - $ref: "#/components/parameters/Slug"
       requestBody:
@@ -280,6 +369,8 @@ paths:
       operationId: archiveProject
       tags: [admin]
       summary: Archive a project without permanently deleting its history
+      security:
+        - sessionCookie: []
       parameters:
         - $ref: "#/components/parameters/Slug"
       responses:
@@ -299,6 +390,8 @@ paths:
       operationId: setProjectPublication
       tags: [admin]
       summary: Publish or unpublish a project
+      security:
+        - sessionCookie: []
       parameters:
         - $ref: "#/components/parameters/Slug"
       requestBody:
@@ -319,6 +412,11 @@ paths:
         "404":
           description: Project not found
 components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: project_hub_session
   parameters:
     Slug:
       in: path
@@ -326,6 +424,42 @@ components:
       required: true
       schema: { type: string, minLength: 1, maxLength: 100 }
   schemas:
+    AuthUser:
+      type: object
+      required: [id, email, displayName, role]
+      properties:
+        id: { type: string }
+        email: { type: string, format: email }
+        displayName: { type: string }
+        role: { type: string, enum: [user, admin] }
+    AuthSession:
+      type: object
+      required: [authenticated, user]
+      properties:
+        authenticated: { type: boolean }
+        user:
+          anyOf:
+            - $ref: "#/components/schemas/AuthUser"
+            - type: "null"
+    AuthResult:
+      type: object
+      required: [user]
+      properties:
+        user: { $ref: "#/components/schemas/AuthUser" }
+    LoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email, maxLength: 254 }
+        password: { type: string, format: password, minLength: 12, maxLength: 128 }
+    RegistrationInput:
+      type: object
+      required: [email, displayName, password]
+      properties:
+        email: { type: string, format: email, maxLength: 254 }
+        displayName: { type: string, minLength: 1, maxLength: 100 }
+        password: { type: string, format: password, minLength: 12, maxLength: 128 }
+        ownerSetupToken: { type: string, maxLength: 512 }
     HealthStatus:
       type: object
       properties:

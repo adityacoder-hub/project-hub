@@ -1,17 +1,12 @@
 import express, { type Express } from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
-import { clerkMiddleware } from "@clerk/express";
-import { publishableKeyFromHost } from "@clerk/shared/keys";
 import pinoHttp from "pino-http";
 import router from "./routes";
 import { logger } from "./lib/logger";
-import {
-  CLERK_PROXY_PATH,
-  clerkProxyMiddleware,
-  getClerkProxyHost,
-} from "./middlewares/clerkProxyMiddleware";
+import { authSessionMiddleware } from "./lib/project-hub-auth";
 
 const app: Express = express();
 app.set("trust proxy", 1);
@@ -35,7 +30,6 @@ app.use(
     },
   }),
 );
-app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -47,28 +41,13 @@ app.use(
         scriptSrc: [
           "'self'",
           "'unsafe-inline'",
-          "https://*.clerk.com",
-          "https://*.clerk.accounts.dev",
-          "https://*.clerk.dev",
-          "https://challenges.cloudflare.com",
         ],
         styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
         fontSrc: ["'self'", "data:", "https://fonts.gstatic.com"],
         imgSrc: ["'self'", "data:", "blob:", "https:"],
-        connectSrc: [
-          "'self'",
-          "https://*.clerk.com",
-          "https://*.clerk.accounts.dev",
-          "https://*.clerk.dev",
-          "wss:",
-        ],
-        frameSrc: [
-          "'self'",
-          "https://*.clerk.com",
-          "https://*.clerk.accounts.dev",
-          "https://challenges.cloudflare.com",
-        ],
-        formAction: ["'self'", "https://*.clerk.com", "https://*.clerk.accounts.dev"],
+        connectSrc: ["'self'", "wss:"],
+        frameSrc: ["'self'"],
+        formAction: ["'self'"],
       },
     },
   }),
@@ -93,6 +72,7 @@ app.use(
 );
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.use(
   rateLimit({
@@ -101,15 +81,6 @@ app.use(
     standardHeaders: "draft-8",
     legacyHeaders: false,
   }),
-);
-
-app.use(
-  clerkMiddleware((req) => ({
-    publishableKey: publishableKeyFromHost(
-      getClerkProxyHost(req) ?? "",
-      process.env.CLERK_PUBLISHABLE_KEY,
-    ),
-  })),
 );
 
 app.use((req, res, next) => {
@@ -136,6 +107,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(authSessionMiddleware);
 app.use("/api", router);
 
 app.use(

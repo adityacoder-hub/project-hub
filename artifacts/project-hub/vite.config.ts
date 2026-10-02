@@ -49,11 +49,6 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@clerk/shared/loadClerkJsScript': path.resolve(
-        import.meta.dirname,
-        'src',
-        'clerk-shared-script-compat.ts',
-      ),
       '@assets': path.resolve(
         import.meta.dirname,
         '..',

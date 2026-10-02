@@ -1,5 +1,6 @@
 import {
   boolean,
+  check,
   date,
   index,
   integer,
@@ -10,6 +11,57 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+
+export type ProjectHubRole = "user" | "admin";
+
+export const authUsersTable = pgTable(
+  "project_hub_users",
+  {
+    id: text("id").primaryKey(),
+    email: text("email").notNull(),
+    passwordHash: text("password_hash").notNull(),
+    displayName: text("display_name").notNull(),
+    role: text("role").$type<ProjectHubRole>().notNull().default("user"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => [
+    uniqueIndex("project_hub_users_email_idx").on(table.email),
+    uniqueIndex("project_hub_users_single_admin_idx")
+      .on(table.role)
+      .where(sql`${table.role} = 'admin'`),
+    check(
+      "project_hub_users_role_check",
+      sql`${table.role} in ('user', 'admin')`,
+    ),
+  ],
+);
+
+export const authSessionsTable = pgTable(
+  "project_hub_sessions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => authUsersTable.id, { onDelete: "cascade" }),
+    tokenHash: text("token_hash").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("project_hub_sessions_token_hash_idx").on(table.tokenHash),
+    index("project_hub_sessions_user_idx").on(table.userId),
+    index("project_hub_sessions_expiry_idx").on(table.expiresAt),
+  ],
+);
 
 export const projectsTable = pgTable(
   "project_hub_projects",

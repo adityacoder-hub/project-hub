@@ -139,6 +139,85 @@ export const RequestProjectDownloadResponse = zod.object({
 
 
 /**
+ * @summary Get the current session, if one exists
+ */
+export const GetAuthSessionResponse = zod.object({
+  "authenticated": zod.boolean(),
+  "user": zod.union([zod.object({
+  "id": zod.string(),
+  "email": zod.string().email(),
+  "displayName": zod.string(),
+  "role": zod.enum(['user', 'admin'])
+}),zod.null()])
+})
+
+
+/**
+ * @summary Create an account and start a session
+ */
+export const signUpBodyEmailMax = 254;
+
+export const signUpBodyDisplayNameMax = 100;
+
+export const signUpBodyPasswordMin = 12;
+export const signUpBodyPasswordMax = 128;
+
+export const signUpBodyOwnerSetupTokenMax = 512;
+
+
+
+export const SignUpBody = zod.object({
+  "email": zod.string().email().max(signUpBodyEmailMax),
+  "displayName": zod.string().min(1).max(signUpBodyDisplayNameMax),
+  "password": zod.string().min(signUpBodyPasswordMin).max(signUpBodyPasswordMax),
+  "ownerSetupToken": zod.string().max(signUpBodyOwnerSetupTokenMax).optional()
+})
+
+export const SignUpResponse = zod.object({
+  "user": zod.object({
+  "id": zod.string(),
+  "email": zod.string().email(),
+  "displayName": zod.string(),
+  "role": zod.enum(['user', 'admin'])
+})
+})
+
+
+/**
+ * @summary Sign in and create a session
+ */
+export const signInBodyEmailMax = 254;
+
+export const signInBodyPasswordMin = 12;
+export const signInBodyPasswordMax = 128;
+
+
+
+export const SignInBody = zod.object({
+  "email": zod.string().email().max(signInBodyEmailMax),
+  "password": zod.string().min(signInBodyPasswordMin).max(signInBodyPasswordMax)
+})
+
+export const SignInResponse = zod.object({
+  "user": zod.object({
+  "id": zod.string(),
+  "email": zod.string().email(),
+  "displayName": zod.string(),
+  "role": zod.enum(['user', 'admin'])
+})
+})
+
+
+/**
+ * @summary Revoke the current session
+ */
+export const SignOutResponse = zod.object({
+  "success": zod.boolean(),
+  "message": zod.string().nullish()
+})
+
+
+/**
  * @summary Get the signed-in account
  */
 export const GetAccountResponse = zod.object({
