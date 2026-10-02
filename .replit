@@ -21,3 +21,8 @@ timeoutMs = 20000
 
 [nix]
 channel = "stable-25_05"
+
+[userenv]
+
+[userenv.shared]
+PROJECT_HUB_OWNER_EMAIL = "aryaarchna1998@gmail.com"
