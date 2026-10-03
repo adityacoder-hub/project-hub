@@ -1,0 +1,1224 @@
+MASTER PROMPT — PROJECT HUB
+FULL BUILD + UPGRADE + SECURITY + PUBLIC-LAUNCH READINESS
+
+IMPORTANT:
+Work on the EXISTING Project Hub project in this Replit workspace.
+
+DO NOT create a separate project.
+DO NOT rebuild the entire application from scratch.
+DO NOT delete or replace the existing project unnecessarily.
+Preserve all currently working Project Hub functionality, routes, components, database structure, authentication logic, project data, styling, and working features wherever possible.
+
+The goal is to finish, repair, secure, polish, test, and make this Project Hub ready for public launch.
+
+==================================================
+1. PRODUCT VISION
+==================================================
+
+Project Hub is my personal project platform.
+
+It is NOT a GitHub clone.
+It is NOT a public user-submission platform.
+
+Only the website owner/admin can add and manage projects.
+
+Public visitors can:
+- browse projects
+- search projects
+- filter projects
+- open project pages
+- view free content
+- view allowed premium previews
+- favorite projects
+- create an account
+- manage their own account
+- access premium content only when authorized
+- download files they are allowed to download
+
+Public visitors MUST NOT be able to:
+- submit projects
+- upload projects
+- add projects
+- edit projects
+- publish projects
+- delete projects
+- access admin functions
+
+Only the owner/admin can manage projects.
+
+The platform will contain only my own projects.
+
+DO NOT list, embed, promote, or distribute other people's repositories.
+DO NOT add a public GitHub repository field to project pages.
+
+==================================================
+2. ZERO-COST / FREE-FIRST REQUIREMENT
+==================================================
+
+Keep the initial project free to build, test, and launch wherever technically possible.
+
+Do not require:
+- paid APIs
+- paid AI services
+- paid authentication
+- paid hosting
+- paid database
+- paid plugins
+- paid development tools
+- unnecessary third-party services
+
+Prefer:
+- standard web technologies
+- open-source libraries
+- free-tier services
+- local/server-side logic
+- free deployment options where available
+
+Do not make paid services mandatory for the basic website to work.
+
+For monetization features that require an external payment provider:
+- prepare secure integration points
+- keep provider configuration in environment variables/secrets
+- never hardcode credentials
+- never fake successful payments
+- never grant premium access based only on frontend state
+
+If real payment configuration is not yet connected:
+- keep the subscription UI present
+- clearly mark checkout/payment as not yet active or Coming Soon
+- do not pretend a payment succeeded
+
+The free version of the platform must continue to work.
+
+==================================================
+3. DESIGN — REAL INTERACTIVE 3D
+==================================================
+
+Create a polished, premium, futuristic PROJECT HUB design.
+
+Use the attached Project Hub visual reference image as design direction when available.
+
+IMPORTANT:
+This must be a REAL interactive 3D-style website, NOT a flat 2D webpage pretending to be 3D.
+
+Use 3D techniques such as Three.js/WebGL only where appropriate.
+
+Design direction:
+- futuristic
+- premium
+- cinematic
+- technology-focused
+- dark primary theme
+- blue/purple accent lighting
+- subtle neon highlights
+- realistic depth
+- layered interface
+- interactive cards
+- elegant motion
+- smooth hover effects
+- subtle parallax
+- polished transitions
+- premium typography
+- modern iconography
+
+Use 3D intelligently.
+Do NOT make the site slow, distracting, or overloaded with effects.
+
+Dark mode:
+- primary/default
+
+Light mode:
+- fully supported
+
+Responsive:
+- desktop
+- laptop
+- tablet
+- mobile
+
+Avoid:
+- cheap-looking templates
+- excessive gradients
+- excessive glow
+- excessive animation
+- visual clutter
+- unusable layouts
+
+==================================================
+4. MAIN NAVIGATION
+==================================================
+
+Create a clean responsive navigation with:
+
+- PROJECT HUB logo/brand
+- Home
+- All Projects
+- Free
+- Premium
+- Categories
+- Search
+- Subscription
+- Favorites
+- Login / Account
+
+Mobile:
+- responsive navigation
+- mobile menu
+- accessible touch targets
+
+==================================================
+5. HOME PAGE
+==================================================
+
+Create a strong 3D futuristic hero.
+
+Hero concept:
+"Discover Amazing Projects for Your Next Big Idea"
+
+Supporting text:
+"Explore, download and use my latest projects, tools, experiments and premium creations."
+
+Include:
+- large search bar
+- featured projects
+- newly added projects
+- popular projects
+- free projects
+- premium projects
+- categories
+- recent updates
+
+Use visual depth and interactive 3D effects.
+
+Create clear project cards with:
+- thumbnail
+- name
+- category
+- short description
+- FREE/PREMIUM badge
+- NEW badge
+- FEATURED badge where appropriate
+- views
+- downloads
+- favorites
+- Open Project button
+
+==================================================
+6. SEARCH
+==================================================
+
+Create a real functional search system.
+
+Search by:
+- project name
+- description
+- category
+- tags
+
+Filters:
+- All
+- Free
+- Premium
+- Latest
+- Popular
+- Category
+
+Sorting:
+- newest
+- popular
+- most downloaded
+- most favorited
+- relevance
+
+Search must actually work.
+Do not create fake filters.
+
+==================================================
+7. CATEGORIES
+==================================================
+
+Initial categories can include:
+
+- AI
+- Anime
+- Tools
+- Games
+- Desktop
+- Web
+- Windows
+- Android
+- Experiments
+
+Categories must be dynamic and manageable from admin.
+
+==================================================
+8. PROJECT SYSTEM
+==================================================
+
+Create a scalable dynamic project system.
+
+Every project must have its own URL.
+
+Examples:
+
+/projects/jarvis
+/projects/anime-vision
+
+The website must NOT need to be rebuilt whenever I add a new project.
+
+Project data should come from the application data layer/database rather than hardcoded page markup wherever practical.
+
+Each project supports:
+
+- id
+- slug
+- name
+- short description
+- full description
+- category
+- tags
+- thumbnail
+- screenshots
+- preview video
+- files
+- version
+- file size
+- requirements
+- supported platforms
+- release date
+- last updated
+- What's New
+- changelog
+- status
+- featured
+- new badge
+- free/premium type
+- price information if applicable
+- views
+- downloads
+- favorites
+
+Possible project statuses:
+- ACTIVE
+- COMING SOON
+- UPDATE
+- MAINTENANCE
+- ARCHIVED
+
+==================================================
+9. INITIAL PROJECTS
+==================================================
+
+Use these only as initial example content/structure:
+
+JARVIS - FREE
+Description:
+A basic version of my JARVIS assistant with free features.
+
+JARVIS - PREMIUM
+Description:
+A premium version of JARVIS with advanced features.
+Clearly label premium features as PREMIUM.
+
+ANIME VISION
+Description:
+A webcam-based anime transformation/visual project.
+
+These examples must be completely editable or removable from Admin.
+
+Do not claim example content is a real released product unless actual data is supplied.
+
+==================================================
+10. FREE PROJECTS
+==================================================
+
+Free projects:
+- public project page
+- visible description
+- public screenshots where intended
+- public preview video where intended
+- free download where intended
+
+==================================================
+11. PREMIUM PROJECTS
+==================================================
+
+Premium projects:
+- clearly marked PREMIUM
+- premium features
+- premium files
+- premium video
+- premium access controls
+
+Premium content MUST be protected server-side.
+
+Do NOT rely on:
+- hidden frontend buttons
+- CSS-only locks
+- JavaScript-only checks
+- predictable URLs
+
+A user must not be able to obtain protected premium files simply by:
+- guessing a URL
+- changing an ID
+- modifying browser state
+- modifying request data
+- calling an API directly without authorization
+
+==================================================
+12. VIDEO SYSTEM
+==================================================
+
+Every project can have a preview video.
+
+FREE:
+- public preview where configured
+
+PREMIUM:
+- locked preview until authorized
+- clear premium message
+- authorized subscription/user can unlock
+
+Never expose a protected premium video through a publicly guessable asset URL.
+
+==================================================
+13. DOWNLOAD SYSTEM
+==================================================
+
+FREE files:
+- accessible according to project configuration
+
+PREMIUM files:
+- server-side authorization required
+- authenticated user required
+- active/valid entitlement or subscription required
+
+Track downloads.
+
+Prevent direct unauthorized premium access.
+
+Do not create fake download functionality.
+
+==================================================
+14. USER ACCOUNTS
+==================================================
+
+Keep:
+
+- Sign Up
+- Login
+- Logout
+- My Account
+- Favorites
+- Download History
+- Notifications
+- Subscription status
+- Settings
+
+Each user must only access their own private data.
+
+Users must NOT be able to:
+- access another user's favorites
+- access another user's download history
+- modify another user's profile
+- modify their own role
+- become admin
+
+==================================================
+15. AUTHENTICATION
+==================================================
+
+DO NOT USE CLERK.
+
+Do NOT install:
+- @clerk/react
+- Clerk SDKs
+- Clerk providers
+- Clerk hooks
+- Clerk environment variables
+- Clerk configuration
+
+Use the existing custom authentication architecture in this project if present.
+
+Authentication must use secure server-side logic.
+
+Passwords:
+- never store plaintext
+- use Argon2id or scrypt where supported
+- never use MD5
+- never use plain SHA256 as password storage
+
+Sessions/cookies:
+- httpOnly
+- secure in production
+- sameSite configured appropriately
+- short/appropriate session lifetime
+- server-side session validation
+
+Do not store sensitive authentication information in localStorage.
+
+Do not trust frontend role information.
+
+Role checks MUST happen server-side.
+
+==================================================
+16. OWNER / ADMIN ACCOUNT
+==================================================
+
+There must be exactly one owner-admin account.
+
+Use the existing Replit Secrets:
+
+PROJECT_HUB_OWNER_EMAIL
+PROJECT_HUB_ADMIN_SETUP_TOKEN
+
+Do NOT hardcode their values.
+
+Owner setup flow:
+
+Sign Up page
+→ "Setting up the owner account?"
+→ secure setup token input
+→ verify owner email against PROJECT_HUB_OWNER_EMAIL
+→ verify setup token against PROJECT_HUB_ADMIN_SETUP_TOKEN
+→ require password of at least 12 characters
+→ create the single owner account
+→ assign OWNER/ADMIN role server-side
+→ redirect to Admin Dashboard
+
+Do NOT allow normal users to claim the owner role.
+
+Do not expose setup token to frontend source, logs, API responses, or client bundles.
+
+==================================================
+17. ADMIN DASHBOARD
+==================================================
+
+Admin area must be private.
+
+Admin navigation:
+
+- Dashboard
+- Projects
+- Users
+- Categories
+- Tags
+- Analytics
+- Settings
+- Logout
+
+Admin capabilities:
+
+PROJECTS:
+- Add
+- Edit
+- Delete
+- Draft
+- Publish
+- Unpublish
+- Archive
+- Duplicate
+- Set Free/Premium
+- Set Featured
+- Set New
+- Upload files
+- Upload/change videos
+- Upload/change screenshots
+- Change thumbnail
+- Change version
+- Change requirements
+- Change descriptions
+- Change changelog
+- Manage categories/tags
+
+Only authorized admin can perform these operations.
+
+==================================================
+18. PROJECT CREATION WORKFLOW
+==================================================
+
+The weekly workflow must be simple:
+
+Admin Dashboard
+→ Add New Project
+→ Enter information
+→ Upload thumbnail
+→ Upload screenshots
+→ Upload preview video
+→ Upload project files
+→ choose FREE or PREMIUM
+→ configure status
+→ Save Draft
+→ Publish
+
+Once published:
+- project gets a URL
+- project appears in correct category
+- project appears in search
+- project appears in Free/Premium
+- project appears in New if marked
+- project appears in Featured if marked
+
+No website rebuild should be needed.
+
+==================================================
+19. FAVORITES
+==================================================
+
+Users can favorite projects.
+
+Users can:
+- add favorite
+- remove favorite
+- view favorites
+- filter favorites
+
+Use server-side ownership checks.
+
+==================================================
+20. DOWNLOAD HISTORY
+==================================================
+
+Track:
+- project
+- version
+- date/time
+- user
+
+Users must only see their own history.
+
+==================================================
+21. NOTIFICATIONS
+==================================================
+
+Support notifications for:
+- new projects
+- new project version
+- important project updates
+- subscription status changes
+
+Users must only see their own private notifications.
+
+==================================================
+22. SUBSCRIPTION ARCHITECTURE
+==================================================
+
+Create secure subscription architecture.
+
+Support:
+- Free plan
+- Premium plan
+- subscription status
+- active state
+- expiration
+- entitlement checks
+- upgrade-ready structure
+- cancellation-ready structure
+
+For production payment integration:
+- server validates payment status
+- server calculates any price/discount logic
+- never trust client-provided price
+- never unlock premium from frontend-only state
+
+If Stripe/Razorpay/another provider is later connected:
+- verify webhook signatures
+- verify payment status server-side
+- make webhook handling idempotent
+- do not grant access merely because the browser says payment succeeded
+
+If no real payment provider is configured yet:
+- do not fake checkout
+- clearly label checkout as not active / Coming Soon
+- keep premium access logic ready
+
+==================================================
+23. ANALYTICS
+==================================================
+
+Admin analytics:
+
+- total users
+- project views
+- downloads
+- favorites
+- subscription count
+- popular projects
+- revenue when payment provider is actually connected
+
+Track project analytics:
+- views
+- downloads
+- favorites
+
+Do not expose private analytics to normal users.
+
+==================================================
+24. PROJECT UPDATES
+==================================================
+
+Support:
+- version
+- release date
+- last updated
+- What's New
+- changelog
+- update notification
+- NEW badge
+
+Allow admin to update projects without recreating them.
+
+==================================================
+25. SEO
+==================================================
+
+Make the site SEO-ready.
+
+Each project page:
+- unique title
+- unique meta description
+- clean slug
+- canonical URL
+- Open Graph metadata
+- correct heading hierarchy
+- breadcrumbs where useful
+- internal linking
+- sitemap
+- robots.txt
+
+Project URLs:
+- /projects/jarvis
+- /projects/anime-vision
+
+Prepare appropriate structured data for individual project pages where valid.
+
+Do not fabricate metadata.
+
+==================================================
+26. ACCESSIBILITY
+==================================================
+
+Use:
+- semantic HTML
+- keyboard navigation
+- visible focus
+- accessible form labels
+- readable text
+- sufficient contrast
+- meaningful alt text
+- accessible buttons and links
+- proper heading hierarchy
+
+==================================================
+27. PERFORMANCE
+==================================================
+
+Optimize:
+- initial page load
+- JavaScript bundle
+- image loading
+- video loading
+- lazy loading
+- code splitting when useful
+- caching
+- database queries
+- unnecessary re-renders
+
+3D effects must degrade gracefully on weak devices.
+
+Do not let visual effects destroy mobile performance.
+
+==================================================
+28. ERROR / EMPTY STATES
+==================================================
+
+Create polished states for:
+
+- loading
+- no search results
+- no projects
+- no favorites
+- no downloads
+- unavailable project
+- closed/archived project
+- unauthorized access
+- failed download
+- subscription unavailable
+- server error
+- 404
+
+Do not expose stack traces to users.
+
+==================================================
+29. LEGAL PAGES
+==================================================
+
+Create:
+
+- Privacy Policy
+- Terms & Conditions
+- Subscription Policy
+- Refund Policy
+- Disclaimer
+
+Do not invent legal guarantees.
+
+==================================================
+30. ADS
+==================================================
+
+Prepare clean ad placement areas for future monetization.
+
+Ads must:
+- not break navigation
+- not be misleading
+- not look like download buttons
+- not encourage accidental clicks
+- not use forced redirects
+
+No fake ads.
+
+If ad integration is not configured, leave clean placeholders or disable the area.
+
+==================================================
+31. SECURITY AUDIT — PDF-BASED
+==================================================
+
+Before public launch, perform ALL FIVE security checks below.
+
+CHECK 1 - SECRET LEAK PREVENTION
+
+Search the entire codebase for:
+- API keys
+- passwords
+- tokens
+- database URLs
+- auth secrets
+- payment secrets
+- OAuth secrets
+- private credentials
+
+Requirements:
+- no real secrets in source code
+- no secrets in comments
+- no secrets in client code
+- sensitive env vars must remain server-side
+- .env must not be committed
+- .gitignore must protect secrets
+- create/update .env.example using placeholders only
+- no secrets in console logs
+- no secrets in error responses
+- no secrets in API responses
+
+Check frontend environment variables carefully.
+
+Do not expose sensitive variables with frontend-public prefixes.
+
+If an old secret was ever hardcoded:
+- identify it
+- warn that it should be rotated
+- remove it from current code
+
+Report every secret issue found.
+
+CHECK 2 - PERSONAL DATA FLOW AUDIT
+
+Map:
+- what personal data is collected
+- where it enters
+- where it is stored
+- where it travels
+- what external services receive it
+
+Check:
+- email
+- name
+- password
+- payment-related data
+- IP
+- device data
+- session data
+- analytics data
+
+Remove private data from:
+- console logs
+- errors
+- API responses
+
+Passwords:
+- never log
+- never return
+- never store plaintext
+
+Cookies:
+- secure
+- httpOnly
+- sameSite
+
+Do not store sensitive personal data in localStorage.
+
+API responses must return only fields actually needed by the client.
+
+Users should have an account deletion/data deletion mechanism.
+
+CHECK 3 - PRE-DEPLOY PRODUCTION AUDIT
+
+Before launch:
+
+ENVIRONMENT:
+- verify required env vars
+- meaningful failure messages for missing critical configuration
+
+DEBUG:
+remove:
+- debug console logs
+- test credentials
+- test-only endpoints
+- /debug
+- /test
+- /admin-backdoor
+- /seed-data
+- accidental backdoors
+- unfinished security TODOs
+
+Debug mode must default OFF.
+
+ERROR HANDLING:
+Do not expose:
+- stack traces
+- file paths
+- SQL details
+- database details
+- internal server information
+
+Use generic client errors.
+Use correlation/request IDs where appropriate.
+
+SECURITY HEADERS:
+Configure appropriate production headers such as:
+- X-Content-Type-Options
+- frame protection
+- Referrer-Policy
+- Permissions-Policy
+- Strict-Transport-Security when HTTPS is guaranteed
+- Content-Security-Policy appropriate to the app
+
+Do not break the site with an overly strict CSP without testing.
+
+RATE LIMITING:
+Protect:
+- login
+- signup
+- password reset
+- sensitive account actions
+- admin actions
+- upload endpoints
+- expensive API endpoints
+
+CORS:
+Do not use allow-all (*) unless genuinely necessary.
+Restrict origins appropriately.
+
+DATABASE:
+In production:
+- encrypted/TLS connection where supported
+- no default credentials
+- no public unrestricted database access
+
+CHECK 4 - DEEP SECURITY AUDIT FOR COMPLEX LOGIC
+
+AUTHORIZATION:
+Check every protected page, route, and endpoint.
+
+Look specifically for IDOR.
+
+Changing:
+- user ID
+- project ID
+- file ID
+- subscription ID
+- download ID
+- notification ID
+
+must NEVER allow unauthorized access.
+
+Password reset if implemented:
+- cryptographically random token
+- single-use
+- short expiry
+- bound to correct account
+
+Do not create unsafe fake password reset.
+
+PAYMENT LOGIC:
+Never trust:
+- client price
+- client discount
+- client quantity
+- client premium flag
+- client subscription state
+
+Server must decide access.
+
+Verify payment webhooks cryptographically.
+
+INPUT:
+Audit:
+- forms
+- query parameters
+- route parameters
+- JSON bodies
+- search
+- filters
+- file names
+- descriptions
+- project metadata
+
+Prevent:
+- SQL injection
+- NoSQL injection
+- XSS
+- unsafe HTML
+- malicious URLs
+- open redirects
+
+Use parameterized queries or safe ORM operations.
+
+FILE UPLOADS:
+- server-side type validation
+- file size limits
+- safe filenames
+- path traversal prevention
+- content validation where appropriate
+- uploaded files must not become executable
+- safe storage
+- authorization before download
+
+CHECK 5 - ATTACKER PERSPECTIVE REVIEW
+
+Actively test the application like an attacker.
+
+TEST:
+1. ID manipulation
+2. login bypass
+3. malformed/expired session
+4. privilege escalation
+5. role tampering
+6. admin route guessing
+7. unauthorized premium download
+8. unauthorized premium video access
+9. cross-user data access
+10. signup abuse
+11. upload abuse
+12. rate-limit abuse
+13. XSS payloads
+14. injection payloads
+15. open redirects
+16. exposed env/config files
+17. exposed .git files
+18. exposed internal APIs/docs
+19. information-leaking error endpoints
+20. payment/business-logic manipulation
+
+Examples of business logic to test:
+- changing premium flag
+- changing price
+- changing quantity
+- reusing a discount
+- bypassing subscription expiration
+- bypassing download restrictions
+
+Fix vulnerabilities found immediately.
+
+Prioritize:
+1. unauthorized access
+2. data theft
+3. admin compromise
+4. premium bypass
+5. payment/business logic abuse
+6. spam/abuse
+7. lower-risk issues
+
+After any major future feature update, rerun the attacker-perspective review.
+
+==================================================
+32. SECURITY DESIGN RULES
+==================================================
+
+Never trust frontend-only security.
+
+Never trust:
+- hidden buttons
+- frontend role flags
+- localStorage entitlement
+- browser state
+- client-supplied prices
+- client-supplied user IDs
+- client-supplied premium status
+
+All sensitive authorization must happen server-side.
+
+==================================================
+33. PRIVACY / DATA MINIMIZATION
+==================================================
+
+Only collect data that is actually required.
+
+Do not collect unnecessary personal information.
+
+Do not send extra user fields to external services.
+
+Do not expose:
+- password hashes
+- secrets
+- private notes
+- other users' data
+- internal authorization data
+
+==================================================
+34. CURRENT REPLIT PREVIEW ISSUE
+==================================================
+
+The current project previously showed a white-screen/Preview problem and browser console messages related to:
+"allow-downloads-without-user-activation"
+
+Do NOT blindly modify the application because of this message.
+
+Determine whether it is a Replit Preview iframe/browser warning.
+
+Find the FIRST real application error causing any crash.
+
+Check:
+- Vite
+- React
+- routing
+- imports
+- runtime exceptions
+- environment variables
+- backend startup
+- API failures
+
+Fix the actual application problem.
+
+Do not create another project.
+
+==================================================
+35. BUILD / RUN / TEST
+==================================================
+
+After making changes:
+
+1. Install only necessary compatible dependencies.
+2. Ensure Clerk is fully removed.
+3. Run the development server.
+4. Run the production build.
+5. Run TypeScript checks.
+6. Fix compile errors.
+7. Fix runtime errors.
+8. Check browser console.
+9. Check server logs.
+10. Verify all routes.
+11. Verify navigation.
+12. Verify search.
+13. Verify filters.
+14. Verify project pages.
+15. Verify project creation.
+16. Verify edit/publish/unpublish.
+17. Verify free downloads.
+18. Verify premium authorization.
+19. Verify favorites.
+20. Verify download history.
+21. Verify notifications.
+22. Verify account isolation.
+23. Verify owner signup.
+24. Verify admin access.
+25. Verify normal user cannot access admin.
+26. Verify responsive mobile UI.
+27. Verify desktop UI.
+28. Verify 3D interactions.
+29. Verify performance.
+30. Verify SEO metadata.
+31. Verify security headers.
+32. Verify no secret exposure.
+33. Verify error states.
+34. Verify 404.
+35. Verify legal pages.
+36. Verify no broken links.
+37. Verify no fake buttons.
+38. Verify no fake payment success.
+39. Verify premium file protection.
+40. Verify premium video protection.
+
+==================================================
+36. PRODUCTION LAUNCH CHECK
+==================================================
+
+Do not say "ready for public launch" unless:
+
+- the app builds successfully
+- Preview works
+- major routes work
+- no known blocking runtime errors
+- no known critical/high security issue remains
+- admin access is protected
+- premium access is protected
+- secrets are not exposed
+- user data is isolated
+- error handling is production-safe
+- mobile layout works
+- desktop layout works
+
+If something cannot be completed because an external service is not configured:
+- do not fake it
+- clearly report the limitation
+- keep the rest of the application functional
+
+==================================================
+37. FINAL REPORT
+==================================================
+
+At the end, provide a concise but complete report:
+
+A. Bugs fixed
+B. Features completed
+C. Dependencies removed
+D. Dependencies added
+E. Authentication status
+F. Admin/owner setup status
+G. Database/storage status
+H. Premium protection status
+I. Security checks performed
+J. Vulnerabilities found and fixed
+K. Remaining limitations
+L. Exact commands used to verify
+M. Whether Preview works
+N. Whether production build works
+O. Any manual steps I still need to perform before Publish
+
+DO NOT hide problems.
+
+==================================================
+38. FINAL RULE
+==================================================
+
+This is a REAL full Project Hub application.
+
+Do not create:
+- a prototype
+- a fake dashboard
+- fake authentication
+- fake subscriptions
+- fake downloads
+- fake admin controls
+- frontend-only premium locks
+- fake analytics
+
+Make the existing application stable, secure, polished, interactive, 3D, scalable, and ready for public use.
+
+Only the owner/admin can add projects.
+
+The website must allow me to add a new project every week without rebuilding the entire website.
+
+Preserve the existing project and improve it in place.
+
+Finish by testing the actual application, not just inspecting the code.

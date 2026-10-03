@@ -451,7 +451,7 @@ function authErrorMessage(error: unknown, fallback: string) {
 function AuthPage({ kind }: { kind: 'signin' | 'signup' }) {
   const [, setLocation] = useLocation();
   const client = useQueryClient();
-  const { isLoaded, isSignedIn } = useAuthAccount();
+  const { isLoaded, isSignedIn, user } = useAuthAccount();
   const signIn = useSignIn();
   const signUp = useSignUp();
   const [displayName, setDisplayName] = useState('');
@@ -466,10 +466,12 @@ function AuthPage({ kind }: { kind: 'signin' | 'signup' }) {
     e.preventDefault();
     setError('');
     try {
+      let destination = '/account';
       if (kind === 'signin') {
-        await signIn.mutateAsync({ data: { email, password } });
+        const result = await signIn.mutateAsync({ data: { email, password } });
+        if (result.user.role === 'admin') destination = '/admin';
       } else {
-        await signUp.mutateAsync({
+        const result = await signUp.mutateAsync({
           data: {
             email,
             displayName,
@@ -477,9 +479,10 @@ function AuthPage({ kind }: { kind: 'signin' | 'signup' }) {
             ...(ownerSetupToken ? { ownerSetupToken } : {}),
           },
         });
+        if (result.user.role === 'admin') destination = '/admin';
       }
       client.clear();
-      setLocation('/account');
+      setLocation(destination);
     } catch (submitError) {
       setError(authErrorMessage(
         submitError,
@@ -488,7 +491,7 @@ function AuthPage({ kind }: { kind: 'signin' | 'signup' }) {
     }
   }
 
-  if (isLoaded && isSignedIn) return <Redirect to="/account" />;
+  if (isLoaded && isSignedIn) return <Redirect to={user?.role === 'admin' ? '/admin' : '/account'} />;
   return <div className="auth-page">
     <Link href="/" className="auth-back"><ArrowLeft size={14} /> Project Hub</Link>
     <div className="auth-side"><div className="eyebrow">A SMALL CATALOG, YOURS TO KEEP</div><h1>Make space for<br /><em>good tools.</em></h1><p>Sign in to save thoughtful software for later.</p><div className="auth-side-art"><div className="auth-mini-orb" /><span>INDEPENDENT / ORIGINAL / OWNER CURATED</span></div></div>
@@ -501,8 +504,14 @@ function AuthPage({ kind }: { kind: 'signin' | 'signup' }) {
         <label htmlFor="auth-email">Email<input id="auth-email" name="email" type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} required maxLength={254} data-testid={`input-${kind}-email`} /></label>
         <label htmlFor="auth-password">Password<input id="auth-password" name="password" type="password" autoComplete={kind === 'signin' ? 'current-password' : 'new-password'} value={password} onChange={e => setPassword(e.target.value)} required minLength={12} maxLength={128} data-testid={`input-${kind}-password`} /><small>Use at least 12 characters.</small></label>
         {kind === 'signup' && <div className="owner-setup-toggle">
-          <button type="button" className="text-button" onClick={() => setShowOwnerSetup(value => !value)} aria-expanded={showOwnerSetup}>{showOwnerSetup ? 'Hide owner setup' : 'Setting up the owner account?'}</button>
-          {showOwnerSetup && <label htmlFor="owner-setup-token">Owner setup code<input id="owner-setup-token" name="ownerSetupToken" type="password" autoComplete="off" value={ownerSetupToken} onChange={e => setOwnerSetupToken(e.target.value)} maxLength={512} /><small>Only the configured owner email can use this one-time setup code.</small></label>}
+          <button id="owner-setup-trigger" type="button" className="owner-setup-trigger" onClick={() => setShowOwnerSetup(value => !value)} aria-expanded={showOwnerSetup} aria-controls="owner-setup-panel">
+            <span className="owner-setup-trigger-label"><ShieldCheck size={16} aria-hidden="true" />Setting up the owner account?</span>
+            <ChevronDown size={16} className={showOwnerSetup ? 'owner-setup-chevron owner-setup-chevron-open' : 'owner-setup-chevron'} aria-hidden="true" />
+          </button>
+          <div id="owner-setup-panel" className="owner-setup-panel" hidden={!showOwnerSetup}>
+            <p className="owner-setup-note">Owner setup requires the configured owner email and private setup token. Regular accounts cannot claim admin access.</p>
+            <label htmlFor="owner-setup-token">Owner setup token<input id="owner-setup-token" name="ownerSetupToken" type="password" autoComplete="off" autoCapitalize="none" spellCheck={false} value={ownerSetupToken} onChange={e => setOwnerSetupToken(e.target.value)} maxLength={512} /><small>The token is checked by the server and is never included in the page source.</small></label>
+          </div>
         </div>}
         {error && <p className="auth-error" role="alert">{error}</p>}
         <button type="submit" className="button button-dark auth-submit" disabled={busy} data-testid={`button-${kind}-submit`}>{busy ? 'Please wait…' : kind === 'signin' ? 'Sign in' : 'Create account'} <ArrowRight size={15} /></button>

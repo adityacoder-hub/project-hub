@@ -518,9 +518,15 @@
 .auth-switch { margin: 4px 0 0; color: hsl(var(--muted-foreground)); text-align: center; font-size: 10px; }
 .auth-switch a { color: hsl(var(--accent)); font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
 .auth-error { margin: 0; padding: 10px 12px; border: 1px solid hsl(var(--destructive) / .22); border-radius: 8px; background: hsl(var(--destructive) / .08); color: hsl(var(--destructive)); font-size: 10px; line-height: 1.5; }
-.owner-setup-toggle { display: flex; flex-direction: column; align-items: flex-start; gap: 11px; padding-top: 2px; }
-.owner-setup-toggle > button { color: hsl(var(--accent)); font-size: 10px; }
-.owner-setup-toggle > label { width: 100%; }
+.owner-setup-toggle { display: flex; flex-direction: column; gap: 9px; padding-top: 1px; }
+.owner-setup-trigger { width: 100%; min-height: 46px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 13px; border: 1px solid hsl(var(--accent) / .42); border-radius: 9px; background: hsl(var(--accent) / .07); color: hsl(var(--secondary-foreground)); text-align: left; font: 800 11px var(--app-font-sans); cursor: pointer; transition: background .18s ease, border-color .18s ease; }
+.owner-setup-trigger:hover { background: hsl(var(--accent) / .12); border-color: hsl(var(--accent) / .65); }
+.owner-setup-trigger-label { display: inline-flex; align-items: center; gap: 9px; }
+.owner-setup-chevron { flex: 0 0 auto; transition: transform .18s ease; }
+.owner-setup-chevron-open { transform: rotate(180deg); }
+.owner-setup-panel { padding: 12px; border: 1px solid hsl(var(--border)); border-radius: 9px; background: hsl(var(--background) / .68); }
+.owner-setup-panel[hidden] { display: none; }
+.owner-setup-note { margin: 0 0 11px; color: hsl(var(--muted-foreground)); font-size: 10px; line-height: 1.6; }
 .admin-access-note { margin: 0; color: hsl(var(--muted-foreground)); font-size: 11px; line-height: 1.6; }
 .auth-header-loading { display: block; width: 74px; height: 34px; border-radius: 999px; background: hsl(var(--muted)); opacity: .45; }
 .auth-footnote { max-width: 440px; margin: 22px auto 0; color: hsl(var(--muted-foreground)); font-size: 9px; line-height: 1.75; text-align: center; }
